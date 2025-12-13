@@ -314,6 +314,15 @@ class RequestHandler {
     async _handlePseudoStreamResponse(proxyRequest, messageQueue, req, res) {
         this.logger.info("[Request] Entering pseudo-stream mode...");
 
+        // Per user request, convert the backend call to non-streaming.
+        proxyRequest.path = proxyRequest.path.replace(
+            ":streamGenerateContent",
+            ":generateContent"
+        );
+        if (proxyRequest.query_params && proxyRequest.query_params.alt) {
+            delete proxyRequest.query_params.alt;
+        }
+
         let connectionMaintainer;
         const scheduleNextKeepAlive = () => {
             const randomInterval = 12000 + Math.floor(Math.random() * 6000); // 12 - 18 seconds
@@ -402,17 +411,28 @@ class RequestHandler {
                 this.authSwitcher.failureCount = 0;
             }
 
-            const dataMessage = await messageQueue.dequeue();
-            const endMessage = await messageQueue.dequeue();
-            if (dataMessage.data) {
-                res.write(`data: ${dataMessage.data}\n\n`);
+            // Read all data chunks until STREAM_END to handle potential fragmentation
+            let fullData = "";
+            let streaming = true;
+            while (streaming) {
+                const message = await messageQueue.dequeue(300000); // 5 min timeout
+                if (message.type === "STREAM_END") {
+                    streaming = false;
+                    break;
+                }
+                if (message.data) {
+                    fullData += message.data;
+                }
             }
-            if (endMessage.type !== "STREAM_END") {
-                this.logger.warn("[Request] Expected stream end signal not received.");
+
+            if (fullData) {
+                res.write(`data: ${fullData}\n\n`);
+            } else {
+                this.logger.warn("[Request] No data received from backend.");
             }
 
             try {
-                const fullResponse = JSON.parse(dataMessage.data);
+                const fullResponse = JSON.parse(fullData);
                 const finishReason
                     = fullResponse.candidates?.[0]?.finishReason || "UNKNOWN";
                 this.logger.info(
@@ -774,7 +794,7 @@ class RequestHandler {
             }
             if (!bodyObj.generationConfig.thinkingConfig) {
                 this.logger.info(
-                    `[Proxy] ⚠️ Force thinking enabled and client did not provide config, injecting thinkingConfig... (Google Native)`
+                    `[Proxy] ⚠️ Force thinking enabled and client did not provide config, injecting thinkingConfig (Google Native)`
                 );
                 bodyObj.generationConfig.thinkingConfig = { includeThoughts: true };
             } else {
