@@ -1,0 +1,185 @@
+/**
+ * File: status.less
+ * Description: Styles for the status page with LESS variables
+ *
+ * Maintainers: iBenzene, bbbugg
+ * Original Author: iBenzene
+ */
+
+@import 'variables.less';
+
+body {
+    font-family: @font-family-mono;
+    background-color: @background-light;
+    color: @text-primary;
+    padding: 2em;
+}
+
+.container {
+    max-width: @container-max-width;
+    margin: 0 auto;
+    background: @background-white;
+    padding: 1em 2em 2em 2em;
+    border-radius: @border-radius-xl;
+    box-shadow: @shadow-light;
+    position: relative;
+}
+
+h1,
+h2 {
+    color: @text-primary;
+    border-bottom: 2px solid @border-light;
+    padding-bottom: 0.5em;
+}
+
+pre {
+    background: @dark-background;
+    color: @dark-text;
+    font-size: @font-size-large;
+    padding: 1.5em;
+    border-radius: @border-radius-md;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.6;
+}
+
+#log-container {
+    font-size: @font-size-small;
+    max-height: @log-container-max-height;
+    overflow-y: auto;
+}
+
+.status-ok {
+    color: @success-color;
+    font-weight: bold;
+}
+
+.status-error {
+    color: @error-color;
+    font-weight: bold;
+}
+
+.label {
+    display: inline-block;
+    width: 220px;
+}
+
+.dot {
+    height: 10px;
+    width: 10px;
+    background-color: #bbb;
+    border-radius: @border-radius-circle;
+    display: inline-block;
+    margin-left: @spacing-sm;
+    vertical-align: middle;
+    animation: blink 1s infinite alternate;
+
+    &.status-running {
+        background-color: @success-color;
+    }
+
+    &.status-error {
+        background-color: @error-color;
+    }
+}
+
+@keyframes blink {
+    from {
+        opacity: 0.3;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: @spacing-md;
+    align-items: center;
+
+    button,
+    select {
+        font-size: @font-size-base;
+        border: 1px solid @border-color;
+        padding: @spacing-sm @spacing-md;
+        border-radius: @border-radius-md;
+        cursor: pointer;
+        transition: background-color @transition-normal;
+        line-height: 1.5;
+        min-height: @button-min-height;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    button {
+        background-color: @primary-color;
+        color: @background-white;
+
+        &:hover {
+            opacity: 0.85;
+        }
+    }
+}
+
+.lang-switcher {
+    position: absolute;
+    top: 35px;
+    right: @spacing-lg;
+    background: transparent;
+    border: none;
+    color: @text-secondary;
+    padding: @spacing-xs;
+    cursor: pointer;
+    transition: all @transition-fast;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        color: @primary-color;
+        transform: scale(1.1);
+    }
+
+    svg {
+        display: block;
+    }
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: @spacing-md;
+    margin: @spacing-md 0;
+
+    .switch-label {
+        font-size: @font-size-base;
+        color: @text-primary;
+        min-width: 150px;
+        font-weight: 500;
+    }
+
+    .switch-status {
+        font-size: @font-size-small;
+        color: @text-secondary;
+        min-width: 60px;
+    }
+}
+
+#app {
+    display: contents;
+}
+
+/* Element Plus button theme override */
+.el-button--primary {
+    --el-button-bg-color: @primary-color;
+    --el-button-border-color: @primary-color;
+    --el-button-hover-bg-color: @primary-hover-color;
+    --el-button-hover-border-color: @primary-hover-color;
+    --el-button-active-bg-color: @primary-active-color;
+    --el-button-active-border-color: @primary-active-color;
+}

@@ -15,8 +15,8 @@ tmp/
 # Config files
 configs/
 
-# Templates (HTML files in public directory)
-public/templates/
+# Templates (HTML files only, not JS/CSS)
+views/templates/*.html
 
 # Build outputs
 dist/

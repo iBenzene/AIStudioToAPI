@@ -23,3 +23,7 @@ configs/auth/
 
 # Temporary files
 tmp/
+
+# Build outputs
+public/styles/*.css
+public/styles/*.css.map

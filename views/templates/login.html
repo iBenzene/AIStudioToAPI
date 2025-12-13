@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="title">Google AI Studio Proxy - Login</title>
+    <link rel="stylesheet" href="/styles/login.css">
+</head>
+
+<body>
+    <form action="/login" method="post">
+        <button type="button" class="lang-switcher" onclick="toggleLanguage()" title="Switch Language">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m5 8 6 6"></path>
+                <path d="m4 14 6-6 2-3"></path>
+                <path d="M2 5h12"></path>
+                <path d="M7 2h1"></path>
+                <path d="m22 22-5-10-5 10"></path>
+                <path d="M14 18h6"></path>
+            </svg>
+        </button>
+        <h2 data-i18n="heading" style="color: rgb(50, 50, 50);">Please enter API Key</h2>
+        <div>
+            <input type="password" name="apiKey" data-i18n-placeholder="apiKeyPlaceholder" placeholder="API Key"
+                required autofocus>
+        </div>
+        <div>
+            <button type="submit" data-i18n="loginBtn">Login</button>
+        </div>
+        {{errorMessageHtml}}
+    </form>
+    <script src="/login.js"></script>
+</body>
+
+</html>

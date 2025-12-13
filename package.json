@@ -6,12 +6,21 @@
     "main": "main.js",
     "scripts": {
         "dev": "cross-env NODE_ENV=development nodemon main.js",
+        "predev": "npm run build:css",
         "start": "cross-env NODE_ENV=production node main.js",
+        "prestart": "npm run build:css",
         "save-auth": "node scripts/saveAuth.js",
         "setup-auth": "scripts\\setupAuth.bat",
         "prepare": "husky install",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix"
+        "build:css": "lessc --clean-css views/styles/login.less public/styles/login.css && lessc --clean-css views/styles/status.less public/styles/status.css",
+        "watch:css": "npm run build:css && nodemon --watch views/styles/*.less --exec \"npm run build:css\"",
+        "prebuild": "npm run build:css",
+        "lint": "eslint . && stylelint \"views/**/*.{css,less}\"",
+        "lint:fix": "eslint . --fix && stylelint \"views/**/*.{css,less}\" --fix",
+        "lint:js": "eslint .",
+        "lint:css": "stylelint \"views/**/*.{css,less}\"",
+        "lint:js:fix": "eslint . --fix",
+        "lint:css:fix": "stylelint \"views/**/*.{css,less}\" --fix"
     },
     "dependencies": {
         "basic-auth": "^2.0.1",
@@ -27,10 +36,17 @@
         "eslint": "^8.57.1",
         "eslint-plugin-sort-keys-fix": "^1.1.2",
         "husky": "^8.0.3",
+        "less": "^4.4.2",
+        "less-plugin-clean-css": "^1.6.0",
         "lint-staged": "^14.0.0",
-        "nodemon": "^3.1.0"
+        "nodemon": "^3.1.0",
+        "stylelint": "^16.26.1",
+        "stylelint-config-standard": "^36.0.1",
+        "stylelint-config-standard-less": "^3.0.1",
+        "stylelint-less": "^3.0.1"
     },
     "lint-staged": {
-        "*.{js,jsx,ts,tsx}": "eslint --fix"
+        "*.{js,jsx,ts,tsx}": "eslint --fix",
+        "views/**/*.{css,less}": "stylelint --fix"
     }
 }

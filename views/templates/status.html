@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Google AI Studio Proxy - Service Status</title>
+
+    <!-- Import Vue.js and Element Plus -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <link rel="stylesheet" href="/styles/status.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <button class="lang-switcher" onclick="toggleLanguage()" title="Switch Language">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m5 8 6 6"></path>
+                    <path d="m4 14 6-6 2-3"></path>
+                    <path d="M2 5h12"></path>
+                    <path d="M7 2h1"></path>
+                    <path d="m22 22-5-10-5 10"></path>
+                    <path d="M14 18h6"></path>
+                </svg>
+            </button>
+            <h1><span data-i18n="heading">Proxy Service Status</span> <span class="dot"></span></h1>
+            <div id="status-section">
+                <pre>
+<span class="label" data-i18n="serviceStatus">Service Status</span>: <span class="status-ok" data-i18n="running">Running</span>
+<span class="label" data-i18n="browserConnection">Browser Connection</span>: <span class="{{browserConnectedClass}}">{{browserConnected}}</span>
+--- <span data-i18n="serviceConfig">Service Configuration</span> ---
+<span class="label" data-i18n="streamingMode">Streaming Mode</span>: {{streamingMode}}
+<span class="label" data-i18n="forceThinking">Force Thinking</span>: {{forceThinking}}
+<span class="label" data-i18n="forceWebSearch">Force Web Search</span>: {{forceWebSearch}}
+<span class="label" data-i18n="forceUrlContext">Force URL Context</span>: {{forceUrlContext}}
+<span class="label" data-i18n="apiKey">API Key</span>: {{apiKeySource}}
+--- <span data-i18n="accountStatus">Account Status</span> ---
+<span class="label" data-i18n="currentAccount">Current Active Account</span>: #{{currentAuthIndex}} ({{currentAccountName}})
+<span class="label" data-i18n="usageCount">Usage Count</span>: {{usageCount}}
+<span class="label" data-i18n="consecutiveFailures">Consecutive Failures</span>: {{failureCount}}
+<span class="label" data-i18n="totalScanned">Total Scanned Accounts</span>: {{totalScannedAccounts}}
+{{accountDetailsHtml}}
+<span class="label" data-i18n="formatErrors">Format Errors (Ignored)</span>: {{formatErrors}}
+        </pre>
+            </div>
+            <div id="actions-section" style="margin-top: 2em;">
+                <h2 data-i18n="actionsPanel">Actions Panel</h2>
+                <div class="action-group">
+                    <select id="account-index-select">{{accountOptionsHtml}}</select>
+                    <button onclick="switchSpecificAccount()" data-i18n="btnSwitchAccount">Switch Account</button>
+                </div>
+                <div class="switch-container">
+                    <span class="switch-label" data-i18n="streamingMode">Streaming Mode</span>
+                    <el-switch v-model="streamingModeReal" :before-change="handleStreamingModeBeforeChange"
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
+                    </el-switch>
+                    <span class="switch-status">{{ streamingModeText }}</span>
+                </div>
+                <div class="switch-container">
+                    <span class="switch-label" data-i18n="forceThinking">Force Thinking</span>
+                    <el-switch v-model="forceThinkingEnabled" :before-change="handleForceThinkingBeforeChange"
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
+                    </el-switch>
+                    <span class="switch-status">{{ forceThinkingText }}</span>
+                </div>
+                <div class="switch-container">
+                    <span class="switch-label" data-i18n="forceWebSearch">Force Web Search</span>
+                    <el-switch v-model="forceWebSearchEnabled" :before-change="handleForceWebSearchBeforeChange"
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
+                    </el-switch>
+                    <span class="switch-status">{{ forceWebSearchText }}</span>
+                </div>
+                <div class="switch-container">
+                    <span class="switch-label" data-i18n="forceUrlContext">Force URL Context</span>
+                    <el-switch v-model="forceUrlContextEnabled" :before-change="handleForceUrlContextBeforeChange"
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
+                    </el-switch>
+                    <span class="switch-status">{{ forceUrlContextText }}</span>
+                </div>
+            </div>
+            <div id="log-section" style="margin-top: 2em;">
+                <h2><span data-i18n="realtimeLogs">Real-time Logs</span> (<span data-i18n="latestEntries">Latest</span>
+                    {{logCount}} <span data-i18n="entries">entries</span>)</h2>
+                <pre id="log-container">{{logs}}</pre>
+            </div>
+        </div>
+    </div>
+    <script src="/status.js"></script>
+</body>
+
+</html>

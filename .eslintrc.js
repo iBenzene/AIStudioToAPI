@@ -23,6 +23,33 @@ module.exports = {
                 es2021: true,
             },
         },
+        {
+            // Frontend JavaScript files - enforce single quotes
+            files: ["views/**/*.js"],
+            env: {
+                browser: true,
+                es2021: true,
+            },
+            globals: {
+                Vue: 'readonly',
+                ElementPlus: 'readonly',
+                toggleLanguage: 'readonly',
+                switchSpecificAccount: 'readonly',
+                updateContent: 'readonly',
+            },
+            rules: {
+                'quotes': ['error', 'single', {
+                    avoidEscape: true,
+                    allowTemplateLiterals: true,
+                }],
+                'no-unused-vars': ['error', {
+                    vars: 'all',
+                    args: 'after-used',
+                    ignoreRestSiblings: true,
+                    varsIgnorePattern: '^(toggleLanguage|switchSpecificAccount|updateContent)$',
+                }],
+            },
+        },
     ],
     rules: {
         // ==================== String Quoting ====================

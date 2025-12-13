@@ -292,7 +292,7 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:streamGen
 - `ICON_URL`：自定义控制台的 favicon 图标 URL
   - 支持任意图片格式（ICO、PNG、SVG 等）
   - 支持任意尺寸，常见尺寸为 16x16、32x32、48x48（ICO 或 PNG）或矢量图（SVG）
-  - 默认值：`/images/AIStudio_icon.svg`（本地 SVG 图标）
+  - 默认值：`/AIStudio_icon.svg`（本地 SVG 图标）
   - 示例：`https://example.com/favicon.ico`
   - 若不设置，则使用默认本地图标
 - `FORCE_THINKING`：强制为所有请求启用思考模式（默认：false）

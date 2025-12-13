@@ -1,0 +1,13 @@
+# Stylelint ignore file
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+public/styles/*.css
+public/styles/*.css.map
+
+# Temporary files
+tmp/

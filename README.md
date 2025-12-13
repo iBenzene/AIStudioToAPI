@@ -292,7 +292,7 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:streamGen
 - `ICON_URL`: Custom favicon URL for the web interface
   - Supports any image format (ICO, PNG, SVG, etc.)
   - Supports any size; common sizes are 16x16, 32x32, 48x48 (ICO/PNG) or vector (SVG)
-  - Default: `/images/AIStudio_icon.svg` (local SVG icon)
+  - Default: `/AIStudio_icon.svg` (local SVG icon)
   - Example: `https://example.com/favicon.ico`
   - If not set, the default local icon will be used
 - `FORCE_THINKING`: Force enable thinking mode for all requests (default: false)

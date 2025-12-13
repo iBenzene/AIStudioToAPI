@@ -120,8 +120,8 @@ class ProxyServerSystem extends EventEmitter {
                 "/api/set-mode", "/api/toggle-force-thinking", "/api/toggle-force-web-search", "/api/toggle-force-url-context"];
 
             // Skip authentication for static files
-            const staticPrefixes = ["/images/"];
-            const isStaticFile = staticPrefixes.some(prefix => req.path.startsWith(prefix));
+            const staticPrefixes = ["/styles/", "/AIStudio_icon.svg", "/AIStudio_logo.svg", "/login.js", "/status.js"];
+            const isStaticFile = staticPrefixes.some(prefix => req.path.startsWith(prefix) || req.path === prefix);
 
             if (whitelistPaths.includes(req.path) || isStaticFile) {
                 return next();
@@ -237,9 +237,12 @@ class ProxyServerSystem extends EventEmitter {
         app.use(express.json({ limit: "100mb" }));
         app.use(express.urlencoded({ extended: true }));
 
-        // Serve static files from public directory (before authentication)
+        // Serve static files from public directory (compiled CSS, images, etc.)
         const path = require("path");
         app.use(express.static(path.join(__dirname, "..", "public")));
+
+        // Serve static files from views directory (client-side JS files)
+        app.use(express.static(path.join(__dirname, "..", "views")));
 
         // Setup session and login
         this.webRoutes.setupSession(app);
