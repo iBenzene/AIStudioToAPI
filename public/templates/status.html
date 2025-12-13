@@ -128,7 +128,6 @@
         .action-group button {
             background-color: #007bff;
             color: white;
-            border-color: #007bff;
         }
 
         .lang-switcher {
@@ -177,6 +176,16 @@
 
         #app {
             display: contents;
+        }
+
+        /* Element Plus button theme override */
+        .el-button--primary {
+            --el-button-bg-color: #007bff;
+            --el-button-border-color: #007bff;
+            --el-button-hover-bg-color: #0069d9;
+            --el-button-hover-border-color: #0069d9;
+            --el-button-active-bg-color: #0056b3;
+            --el-button-active-border-color: #0056b3;
         }
     </style>
 </head>
@@ -238,14 +247,14 @@
                 <div class="switch-container">
                     <span class="switch-label" data-i18n="forceWebSearch">Force Web Search</span>
                     <el-switch v-model="forceWebSearchEnabled" :before-change="handleForceWebSearchBeforeChange"
-                               style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
                     </el-switch>
                     <span class="switch-status">{{ forceWebSearchText }}</span>
                 </div>
                 <div class="switch-container">
                     <span class="switch-label" data-i18n="forceUrlContext">Force URL Context</span>
                     <el-switch v-model="forceUrlContextEnabled" :before-change="handleForceUrlContextBeforeChange"
-                               style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6">
                     </el-switch>
                     <span class="switch-status">{{ forceUrlContextText }}</span>
                 </div>
@@ -400,7 +409,7 @@
                     });
                 },
                 handleForceThinkingBeforeChange() {
-                    if (this.isUpdating)  { return false; }
+                    if (this.isUpdating) { return false; }
 
                     const newValue = !this.forceThinkingEnabled;
 
@@ -418,7 +427,7 @@
                     });
                 },
                 handleForceWebSearchBeforeChange() {
-                    if (this.isUpdating)  { return false; }
+                    if (this.isUpdating) { return false; }
 
                     const newValue = !this.forceWebSearchEnabled;
 
@@ -436,7 +445,7 @@
                     });
                 },
                 handleForceUrlContextBeforeChange() {
-                    if (this.isUpdating)  { return false; }
+                    if (this.isUpdating) { return false; }
 
                     const newValue = !this.forceUrlContextEnabled;
 
@@ -536,14 +545,26 @@
 
         const switchSpecificAccount = () => {
             const targetIndex = document.getElementById('account-index-select').value;
-            if (!confirm(t('confirmSwitch') + ' #' + targetIndex + '?')) return;
-            fetch('/api/switch-account', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ targetIndex: parseInt(targetIndex, 10) })
-            })
-                .then(res => res.text()).then(data => { ElementPlus.ElMessage.success(data); updateContent(); })
-                .catch(err => { ElementPlus.ElMessage.info(t('operationInProgress')); updateContent(); });
+            ElementPlus.ElMessageBox.confirm(
+                t('confirmSwitch') + ' #' + targetIndex + '?',
+                {
+                    confirmButtonText: currentLang === 'zh' ? '确定' : 'OK',
+                    cancelButtonText: currentLang === 'zh' ? '取消' : 'Cancel',
+                    type: 'warning'
+                }
+            )
+                .then(() => {
+                    fetch('/api/switch-account', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ targetIndex: parseInt(targetIndex, 10) })
+                    })
+                        .then(res => res.text()).then(data => { ElementPlus.ElMessage.success(data); updateContent(); })
+                        .catch(err => { ElementPlus.ElMessage.info(t('operationInProgress')); updateContent(); });
+                })
+                .catch(() => {
+                    // User cancelled
+                });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
