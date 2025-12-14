@@ -222,6 +222,24 @@ location / {
 
 ### 🤖 OpenAI-Compatible API
 
+This endpoint is processed and then forwarded to the official Gemini API format endpoint.
+
+*   `GET /openai/v1/models`: List models.
+*   `POST /openai/v1/chat/completions`: Chat completion, supports non-streaming, real streaming, and fake streaming.
+
+### ♊ Gemini Native API Format
+
+This endpoint is forwarded to the official Gemini API format endpoint.
+
+*   `GET /models`: List available Gemini models.
+*   `POST /models/{model_name}:generateContent`: Generate content.
+*   `POST /models/{model_name}:streamGenerateContent`: Stream content generation, supports real and fake streaming.
+
+<details>
+  <summary><h3>Usage Examples</h3></summary>
+
+#### 🤖 OpenAI-Compatible API
+
 ```bash
 curl -X POST http://localhost:7860/v1/chat/completions \
   -H "Content-Type: application/json" \
@@ -238,7 +256,7 @@ curl -X POST http://localhost:7860/v1/chat/completions \
   }'
 ```
 
-### ♊ Gemini Native API Format
+#### ♊ Gemini Native API Format
 
 ```bash
 curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:generateContent \
@@ -258,7 +276,7 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:generateC
   }'
 ```
 
-### 🌊 Streaming Response
+#### 🌊 Streaming Response
 
 ```bash
 # OpenAI Compatible Streaming Response
@@ -296,31 +314,32 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:streamGen
   }'
 ```
 
+</details>
+
 ## ⚙️ Configuration
 
 ### 🔧 Environment Variables
 
-- `API_KEYS`: Comma-separated list of valid API keys for authentication
-- `PORT`: API server port (default: 7860)
-- `HOST`: Server listening host address (default: 0.0.0.0)
-- `STREAMING_MODE`: Streaming mode (default: `real`), only effective when streaming is enabled for the request.
-  - `real`: True streaming - directly forwards streaming responses from AI Studio to client
-  - `fake`: Simulated streaming - requests AI Studio in non-streaming mode, then converts the complete response to streaming format for the client
-- `SECURE_COOKIES`: Enable secure cookies (HTTPS only)
-  - Set to `true`: Only HTTPS connections can login (for production with SSL certificates)
-  - Set to `false` or leave unset: Both HTTP and HTTPS can login (default, beginner-friendly)
-- `ICON_URL`: Custom favicon URL for the web interface
-  - Supports any image format (ICO, PNG, SVG, etc.)
-  - Supports any size; common sizes are 16x16, 32x32, 48x48 (ICO/PNG) or vector (SVG)
-  - Default: `/AIStudio_icon.svg` (local SVG icon)
-  - Example: `https://example.com/favicon.ico`
-  - If not set, the default local icon will be used
-- `FORCE_THINKING`: Force enable thinking mode for all requests (default: false)
-  - When set to `true`, all requests will use thinking mode regardless of client settings
-- `FORCE_WEB_SEARCH`: Force enable web search for all requests (default: false)
-  - When set to `true`, all requests will include web search capability
-- `FORCE_URL_CONTEXT`: Force enable URL context for all requests (default: false)
-  - When set to `true`, all requests will include URL context capability
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| **Application Configuration** | | |
+| `API_KEYS` | Comma-separated list of valid API keys for authentication. | `123456` |
+| `PORT` | API server port. | `7860` |
+| `HOST` | Server listening host address. | `0.0.0.0` |
+| `ICON_URL` | Custom favicon URL for the console. Supports ICO, PNG, SVG, etc. | `/AIStudio_icon.svg` |
+| **Security Settings** | | |
+| `SECURE_COOKIES` | Enable secure cookies. `true` for HTTPS only, `false` for both HTTP and HTTPS. | `false` |
+| **Model Invocation Features** | | |
+| `STREAMING_MODE` | Streaming mode. `real` for true streaming, `fake` for simulated streaming. | `real` |
+| `FORCE_THINKING` | Force enable thinking mode for all requests. | `false` |
+| `FORCE_WEB_SEARCH` | Force enable web search for all requests. | `false` |
+| `FORCE_URL_CONTEXT` | Force enable URL context for all requests. | `false` |
+| **Automatic Account Switching & Retries** | | |
+| `MAX_RETRIES` | Maximum number of retries for failed requests. | `3` |
+| `RETRY_DELAY` | Delay between retries in milliseconds. | `2000` |
+| `SWITCH_ON_USES` | Number of requests before automatically switching accounts (0 to disable). | `40` |
+| `FAILURE_THRESHOLD` | Number of consecutive failures before switching accounts (0 to disable). | `3` |
+| `IMMEDIATE_SWITCH_STATUS_CODES` | HTTP status codes that trigger immediate account switching (comma-separated). | `429,503` |
 
 ### 🧠 Model Configuration
 

@@ -221,6 +221,24 @@ location / {
 
 ### 🤖 OpenAI 兼容 API
 
+此端点处理后转发到官方 Gemini API 格式端点，支持思考参数。
+
+*   `GET /openai/v1/models`: 列出模型。
+*   `POST /openai/v1/chat/completions`: 聊天补全，支持非流式、真流式和假流式。
+
+### ♊ Gemini 原生 API 格式
+
+此端点转发到官方 Gemini API 格式端点，支持各种扩展参数。
+
+*   `GET /models`: 列出可用的 Gemini 模型。
+*   `POST /models/{model_name}:generateContent`: 生成内容。
+*   `POST /models/{model_name}:streamGenerateContent`: 流式生成内容，支持真流式和假流式。
+
+<details>
+  <summary><h3>使用示例</h3></summary>
+
+#### 🤖 OpenAI 兼容 API
+
 ```bash
 curl -X POST http://localhost:7860/v1/chat/completions \
   -H "Content-Type: application/json" \
@@ -237,7 +255,7 @@ curl -X POST http://localhost:7860/v1/chat/completions \
   }'
 ```
 
-### ♊ Gemini 原生 API 格式
+#### ♊ Gemini 原生 API 格式
 
 ```bash
 curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:generateContent \
@@ -257,7 +275,7 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:generateC
   }'
 ```
 
-### 🌊 流式响应
+#### 🌊 流式响应
 
 ```bash
 # OpenAI 兼容 API 流式响应
@@ -295,33 +313,34 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-lite:streamGen
   }'
 ```
 
+</details>
+
 ## ⚙️ 相关配置
 
 ### 🔧 环境变量
 
-- `API_KEYS`：用于身份验证的有效 API 密钥列表（使用逗号分隔）
-- `PORT`：API 服务器端口（默认：7860）
-- `HOST`：服务器监听主机地址（默认：0.0.0.0）
-- `STREAMING_MODE`：流式传输模式（默认：`real`），仅对请求时开启流式生效
-  - `real`：真实流式传输 - 直接转发 AI Studio 的流式响应给客户端
-  - `fake`：模拟流式传输 - 以非流式方式请求 AI Studio，然后将完整的响应转换为流式格式返回给客户端
-- `SECURE_COOKIES`：是否启用安全 Cookie（HTTPS only）
-  - 设置为 `true`：仅 HTTPS 连接可登录（适用于配置了 SSL 证书的生产环境）
-  - 设置为 `false` 或不设置：HTTP 和 HTTPS 都可登录（默认，新手友好）
-- `ICON_URL`：自定义控制台的 favicon 图标 URL
-  - 支持任意图片格式（ICO、PNG、SVG 等）
-  - 支持任意尺寸，常见尺寸为 16x16、32x32、48x48（ICO 或 PNG）或矢量图（SVG）
-  - 默认值：`/AIStudio_icon.svg`（本地 SVG 图标）
-  - 示例：`https://example.com/favicon.ico`
-  - 若不设置，则使用默认本地图标
-- `FORCE_THINKING`：强制为所有请求启用思考模式（默认：false）
-  - 设置为 `true` 时，所有请求都将使用思考模式，不受客户端设置的影响
-- `FORCE_WEB_SEARCH`：强制为所有请求启用网络搜索（默认：false）
-  - 设置为 `true` 时，所有请求都将包含网络搜索功能
-- `FORCE_URL_CONTEXT`：强制为所有请求启用 URL 上下文（默认：false）
-  - 设置为 `true` 时，所有请求都将包含 URL 上下文功能
+| 变量名 | 描述 | 默认值                  |
+| :--- | :--- |:---------------------|
+| **应用配置** | |                      |
+| `API_KEYS` | 用于身份验证的有效 API 密钥列表（使用逗号分隔） | `123456`               |
+| `PORT` | API 服务器端口 | `7860`               |
+| `HOST` | 服务器监听主机地址 | `0.0.0.0`            |
+| `ICON_URL` | 自定义控制台的 favicon 图标 URL。支持 ICO, PNG, SVG 等格式。 | `/AIStudio_icon.svg` |
+| **安全设置** | |                      |
+| `SECURE_COOKIES` | 是否启用安全 Cookie。`true` 表示仅 HTTPS，`false` 表示 HTTP 和 HTTPS。 | `false`              |
+| **模型调用功能** | |                      |
+| `STREAMING_MODE` | 流式传输模式。`real` 为真实流式，`fake` 为模拟流式。 | `real`               |
+| `FORCE_THINKING` | 强制为所有请求启用思考模式。 | `false`              |
+| `FORCE_WEB_SEARCH` | 强制为所有请求启用网络搜索。 | `false`              |
+| `FORCE_URL_CONTEXT` | 强制为所有请求启用 URL 上下文。 | `false`              |
+| **自动账户切换与重试** | |                      |
+| `MAX_RETRIES` | 请求失败后的最大重试次数。 | `3`                  |
+| `RETRY_DELAY` | 两次重试之间的延迟（毫秒）。 | `2000`               |
+| `SWITCH_ON_USES` | 自动切换帐户前的请求次数（0 禁用）。 | `40`                 |
+| `FAILURE_THRESHOLD` | 切换帐户前的连续失败次数（0 禁用）。 | `3`                  |
+| `IMMEDIATE_SWITCH_STATUS_CODES` | 触发立即切换帐户的 HTTP 状态码（逗号分隔）。 | `429,503`            |
 
-### 🧠 模型配置
+### 🧠 模型列表配置
 
 编辑 `configs/models.json` 以自定义可用模型及其设置。
 
