@@ -16,7 +16,7 @@
 <body>
     <div id="app">
         <div class="container">
-            <button class="lang-switcher" onclick="toggleLanguage()" title="Switch Language">
+            <button class="lang-switcher" onclick="toggleLanguage()" title="Switch Language" :disabled="isSwitchingAccount">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m5 8 6 6"></path>
@@ -50,8 +50,10 @@
             <div id="actions-section" style="margin-top: 2em;">
                 <h2 data-i18n="actionsPanel">Actions Panel</h2>
                 <div class="action-group">
-                    <select id="account-index-select">{{accountOptionsHtml}}</select>
-                    <button onclick="switchSpecificAccount()" data-i18n="btnSwitchAccount">Switch Account</button>
+                    <select id="account-index-select" :disabled="isSwitchingAccount">{{accountOptionsHtml}}</select>
+                    <el-button id="switch-account-btn" @click="switchSpecificAccount" :loading="isSwitchingAccount" :disabled="isSwitchingAccount">
+                        <span>{{ t('btnSwitchAccount') }}</span>
+                    </el-button>
                 </div>
                 <div class="switch-container">
                     <span class="switch-label" data-i18n="streamingMode">Streaming Mode</span>

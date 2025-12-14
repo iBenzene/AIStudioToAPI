@@ -88,6 +88,11 @@ const applyLanguage = lang => {
         }
     });
 
+    // Update Vue language state if app is mounted
+    if (vueApp) {
+        vueApp.lang = lang;
+    }
+
     // Refresh content to apply translations
     updateContent();
 };
@@ -123,7 +128,9 @@ createApp({
             forceThinkingEnabled: false,
             forceUrlContextEnabled: false,
             forceWebSearchEnabled: false,
+            isSwitchingAccount: false,
             isUpdating: false,
+            lang: currentLang,
             streamingModeReal: false,
         };
     },
@@ -201,6 +208,55 @@ createApp({
                     });
             });
         },
+        switchSpecificAccount() {
+            const targetIndex = parseInt(document.getElementById('account-index-select').value, 10);
+
+            if (this.currentAuthIndex === targetIndex) {
+                ElementPlus.ElMessage.warning(this.t('alreadyCurrentAccount'));
+                return;
+            }
+
+            ElementPlus.ElMessageBox.confirm(
+                this.t('confirmSwitch') + ' #' + targetIndex + '?',
+                {
+                    cancelButtonText: this.lang === 'zh' ? '取消' : 'Cancel',
+                    confirmButtonText: this.lang === 'zh' ? '确定' : 'OK',
+                    lockScroll: false,
+                    type: 'warning',
+                }
+            )
+                .then(() => {
+                    this.isSwitchingAccount = true;
+                    fetch('/api/switch-account', {
+                        body: JSON.stringify({ targetIndex }),
+                        headers: { 'Content-Type': 'application/json' },
+                        method: 'POST',
+                    })
+                        .then(async res => {
+                            const data = await res.text();
+                            if (res.ok) {
+                                ElementPlus.ElMessage.success(data);
+                            } else {
+                                ElementPlus.ElMessage.error(data);
+                            }
+                        })
+                        .catch(err => {
+                            ElementPlus.ElMessage.error(this.t('settingFailed') + (err.message || err));
+                        })
+                        .finally(() => {
+                            this.isSwitchingAccount = false;
+                            updateContent();
+                        });
+                })
+                .catch(e => {
+                    if (e !== 'cancel') {
+                        console.error(e);
+                    }
+                });
+        },
+        t(key) {
+            return translations[this.lang][key] || key;
+        },
         updateSwitchStates(data) {
             this.isUpdating = true;
             this.streamingModeReal = data.status.streamingMode.includes('real');
@@ -232,6 +288,16 @@ createApp({
         this.$nextTick(() => {
             this.isUpdating = false;
         });
+    },
+    watch: {
+        isSwitchingAccount(newVal) {
+            // Manually toggle disabled state for the select element
+            // This is a fallback in case Vue binding fails due to backend template injection
+            const selectEl = document.getElementById('account-index-select');
+            if (selectEl) {
+                selectEl.disabled = newVal;
+            }
+        },
     },
 }).use(ElementPlus).mount('#app');
 
@@ -293,56 +359,6 @@ const updateContent = () => {
             // Update service status to disconnected
             const statusPre = document.querySelector('#status-section pre');
             statusPre.innerHTML = '<span class="label">' + t('serviceStatus') + '</span>: <span class="status-error">' + t('disconnected') + '</span>';
-        });
-};
-
-const switchSpecificAccount = () => {
-    const targetIndex = parseInt(document.getElementById('account-index-select').value, 10);
-
-    // Check if target account is the same as current account
-    if (vueApp && vueApp.currentAuthIndex === targetIndex) {
-        ElementPlus.ElMessage.warning(t('alreadyCurrentAccount'));
-        return;
-    }
-
-    ElementPlus.ElMessageBox.confirm(
-        t('confirmSwitch') + ' #' + targetIndex + '?',
-        {
-            cancelButtonText: currentLang === 'zh' ? '取消' : 'Cancel',
-            confirmButtonText: currentLang === 'zh' ? '确定' : 'OK',
-            type: 'warning',
-        }
-    )
-        .then(() => {
-            const loading = ElementPlus.ElLoading.service({
-                background: 'rgba(0, 0, 0, 0.7)',
-                lock: true,
-                text: 'Switching account, please wait...',
-            });
-
-            fetch('/api/switch-account', {
-                body: JSON.stringify({ targetIndex: parseInt(targetIndex, 10) }),
-                headers: { 'Content-Type': 'application/json' },
-                method: 'POST',
-            })
-                .then(async res => {
-                    const data = await res.text();
-                    loading.close();
-                    if (res.ok) {
-                        ElementPlus.ElMessage.success(data);
-                    } else {
-                        ElementPlus.ElMessage.error(data);
-                    }
-                    updateContent();
-                })
-                .catch(err => {
-                    loading.close();
-                    ElementPlus.ElMessage.error(t('settingFailed') + (err.message || err));
-                    updateContent();
-                });
-        })
-        .catch(() => {
-            // User cancelled
         });
 };
 

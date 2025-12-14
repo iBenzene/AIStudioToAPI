@@ -803,7 +803,7 @@ class RequestHandler {
             }
             if (!bodyObj.generationConfig.thinkingConfig) {
                 this.logger.info(
-                    `[Proxy] ⚠️ Force thinking enabled and client did not provide config, injecting thinkingConfig (Google Native)`
+                    `[Proxy] ⚠️ Force thinking enabled and client did not provide config, injecting thinkingConfig. (Google Native)`
                 );
                 bodyObj.generationConfig.thinkingConfig = { includeThoughts: true };
             } else {

@@ -128,7 +128,7 @@ class FormatConverter {
         // Force thinking mode
         if (this.serverSystem.forceThinking && !thinkingConfig) {
             this.logger.info(
-                "[Adapter] ⚠️ Force thinking enabled and client did not provide config, injecting thinkingConfig"
+                "[Adapter] ⚠️ Force thinking enabled and client did not provide config, injecting thinkingConfig."
             );
             thinkingConfig = { includeThoughts: true };
         }

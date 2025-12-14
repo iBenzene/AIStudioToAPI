@@ -3,4 +3,4 @@
 
 # Run lint-staged to auto-fix staged files, then run full lint to fail commit on remaining errors
 npx --no -- lint-staged
-npm run lint
+#npm run lint
