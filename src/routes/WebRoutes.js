@@ -23,7 +23,7 @@ class WebRoutes {
         this.serverSystem = serverSystem;
         this.logger = serverSystem.logger;
         this.config = serverSystem.config;
-        this.distIndexPath = path.join(__dirname, "..", "ui", "dist", "index.html");
+        this.distIndexPath = path.join(__dirname, "..", "..", "ui", "dist", "index.html");
         this.loginAttempts = new Map(); // Track login attempts for rate limiting
         this.vncSession = null;
         this.isVncOperationInProgress = false; // Mutex for VNC operations

@@ -312,13 +312,13 @@ class ProxyServerSystem extends EventEmitter {
 
         // Serve static files from ui/dist (Vite build output)
         const path = require("path");
-        app.use(express.static(path.join(__dirname, "..", "ui", "dist")));
+        app.use(express.static(path.join(__dirname, "..", "..", "ui", "dist")));
 
         // Serve additional public assets under ui/public
-        app.use(express.static(path.join(__dirname, "..", "ui", "public")));
+        app.use(express.static(path.join(__dirname, "..", "..", "ui", "public")));
 
         // Serve locales for front-end only translations
-        app.use("/locales", express.static(path.join(__dirname, "..", "ui", "locales")));
+        app.use("/locales", express.static(path.join(__dirname, "..", "..", "ui", "locales")));
 
         // Setup session and login
         this.webRoutes.setupSession(app);

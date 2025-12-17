@@ -9,10 +9,10 @@
 import { createApp } from 'vue';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
-import App from './app/App.vue';
-import router from './app/router';
-import I18n from './app/utils/i18n';
-import './app/styles/status.less';
+import App from './/App.vue';
+import router from './router';
+import I18n from './utils/i18n';
+import './/styles/status.less';
 
 const app = createApp(App);
 app.use(router);

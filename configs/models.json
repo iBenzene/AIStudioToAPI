@@ -1,232 +1,232 @@
 {
-  "models": [
-    {
-      "name": "models/gemini-2.5-flash",
-      "version": "001",
-      "displayName": "Gemini 2.5 Flash",
-      "description": "Stable version of Gemini 2.5 Flash, our mid-size multimodal model that supports up to 1 million tokens, released in June of 2025.",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-2.5-pro",
-      "version": "2.5",
-      "displayName": "Gemini 2.5 Pro",
-      "description": "Stable release (June 17th, 2025) of Gemini 2.5 Pro",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-flash-latest",
-      "version": "Gemini Flash Latest",
-      "displayName": "Gemini Flash Latest",
-      "description": "Latest release of Gemini Flash",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-flash-lite-latest",
-      "version": "Gemini Flash-Lite Latest",
-      "displayName": "Gemini Flash-Lite Latest",
-      "description": "Latest release of Gemini Flash-Lite",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "modelStage": "UNSTABLE_EXPERIMENTAL",
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-pro-latest",
-      "version": "Gemini Pro Latest",
-      "displayName": "Gemini Pro Latest",
-      "description": "Latest release of Gemini Pro",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-2.5-flash-lite",
-      "version": "001",
-      "displayName": "Gemini 2.5 Flash-Lite",
-      "description": "Stable version of Gemini 2.5 Flash-Lite, released in July of 2025",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "modelStage": "UNSTABLE_EXPERIMENTAL",
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-2.5-flash-image-preview",
-      "version": "2.0",
-      "displayName": "Nano Banana",
-      "description": "Gemini 2.5 Flash Preview Image",
-      "inputTokenLimit": 32768,
-      "outputTokenLimit": 32768,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "modelStage": "UNSTABLE_EXPERIMENTAL",
-      "maxTemperature": 1.0
-    },
-    {
-      "name": "models/gemini-2.5-flash-image",
-      "version": "2.0",
-      "displayName": "Nano Banana",
-      "description": "Gemini 2.5 Flash Preview Image",
-      "inputTokenLimit": 32768,
-      "outputTokenLimit": 32768,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 1.0
-    },
-    {
-      "name": "models/gemini-2.5-flash-preview-09-2025",
-      "version": "Gemini 2.5 Flash Preview 09-2025",
-      "displayName": "Gemini 2.5 Flash Preview Sep 2025",
-      "description": "Gemini 2.5 Flash Preview Sep 2025",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-2.5-flash-lite-preview-09-2025",
-      "version": "2.5-preview-09-25",
-      "displayName": "Gemini 2.5 Flash-Lite Preview Sep 2025",
-      "description": "Preview release (Septempber 25th, 2025) of Gemini 2.5 Flash-Lite",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "modelStage": "UNSTABLE_EXPERIMENTAL",
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-3-pro-preview",
-      "version": "3-pro-preview-11-2025",
-      "displayName": "Gemini 3 Pro Preview",
-      "description": "Gemini 3 Pro Preview",
-      "inputTokenLimit": 1048576,
-      "outputTokenLimit": 65536,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "createCachedContent",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "maxTemperature": 2.0,
-      "thinking": true
-    },
-    {
-      "name": "models/gemini-3-pro-image-preview",
-      "version": "3.0",
-      "displayName": "Nano Banana Pro",
-      "description": "Gemini 3 Pro Image Preview",
-      "inputTokenLimit": 131072,
-      "outputTokenLimit": 32768,
-      "supportedGenerationMethods": [
-        "generateContent",
-        "countTokens",
-        "batchGenerateContent"
-      ],
-      "temperature": 1.0,
-      "topP": 0.95,
-      "topK": 64,
-      "modelStage": "UNSTABLE_EXPERIMENTAL",
-      "maxTemperature": 1.0,
-      "thinking": true
-    }
-  ]
+    "models": [
+        {
+            "name": "models/gemini-2.5-flash",
+            "version": "001",
+            "displayName": "Gemini 2.5 Flash",
+            "description": "Stable version of Gemini 2.5 Flash, our mid-size multimodal model that supports up to 1 million tokens, released in June of 2025.",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-2.5-pro",
+            "version": "2.5",
+            "displayName": "Gemini 2.5 Pro",
+            "description": "Stable release (June 17th, 2025) of Gemini 2.5 Pro",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-flash-latest",
+            "version": "Gemini Flash Latest",
+            "displayName": "Gemini Flash Latest",
+            "description": "Latest release of Gemini Flash",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-flash-lite-latest",
+            "version": "Gemini Flash-Lite Latest",
+            "displayName": "Gemini Flash-Lite Latest",
+            "description": "Latest release of Gemini Flash-Lite",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "modelStage": "UNSTABLE_EXPERIMENTAL",
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-pro-latest",
+            "version": "Gemini Pro Latest",
+            "displayName": "Gemini Pro Latest",
+            "description": "Latest release of Gemini Pro",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-2.5-flash-lite",
+            "version": "001",
+            "displayName": "Gemini 2.5 Flash-Lite",
+            "description": "Stable version of Gemini 2.5 Flash-Lite, released in July of 2025",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "modelStage": "UNSTABLE_EXPERIMENTAL",
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-2.5-flash-image-preview",
+            "version": "2.0",
+            "displayName": "Nano Banana",
+            "description": "Gemini 2.5 Flash Preview Image",
+            "inputTokenLimit": 32768,
+            "outputTokenLimit": 32768,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "modelStage": "UNSTABLE_EXPERIMENTAL",
+            "maxTemperature": 1.0
+        },
+        {
+            "name": "models/gemini-2.5-flash-image",
+            "version": "2.0",
+            "displayName": "Nano Banana",
+            "description": "Gemini 2.5 Flash Preview Image",
+            "inputTokenLimit": 32768,
+            "outputTokenLimit": 32768,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 1.0
+        },
+        {
+            "name": "models/gemini-2.5-flash-preview-09-2025",
+            "version": "Gemini 2.5 Flash Preview 09-2025",
+            "displayName": "Gemini 2.5 Flash Preview Sep 2025",
+            "description": "Gemini 2.5 Flash Preview Sep 2025",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-2.5-flash-lite-preview-09-2025",
+            "version": "2.5-preview-09-25",
+            "displayName": "Gemini 2.5 Flash-Lite Preview Sep 2025",
+            "description": "Preview release (Septempber 25th, 2025) of Gemini 2.5 Flash-Lite",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "modelStage": "UNSTABLE_EXPERIMENTAL",
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-3-pro-preview",
+            "version": "3-pro-preview-11-2025",
+            "displayName": "Gemini 3 Pro Preview",
+            "description": "Gemini 3 Pro Preview",
+            "inputTokenLimit": 1048576,
+            "outputTokenLimit": 65536,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "createCachedContent",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "maxTemperature": 2.0,
+            "thinking": true
+        },
+        {
+            "name": "models/gemini-3-pro-image-preview",
+            "version": "3.0",
+            "displayName": "Nano Banana Pro",
+            "description": "Gemini 3 Pro Image Preview",
+            "inputTokenLimit": 131072,
+            "outputTokenLimit": 32768,
+            "supportedGenerationMethods": [
+                "generateContent",
+                "countTokens",
+                "batchGenerateContent"
+            ],
+            "temperature": 1.0,
+            "topP": 0.95,
+            "topK": 64,
+            "modelStage": "UNSTABLE_EXPERIMENTAL",
+            "maxTemperature": 1.0,
+            "thinking": true
+        }
+    ]
 }

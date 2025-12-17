@@ -5,7 +5,7 @@
     "description": "Encapsulate Gemini models on AI Studio as API services.",
     "main": "main.js",
     "scripts": {
-        "dev": "concurrently \"npm run dev:server\" \"npm run dev:ui\"",
+        "dev": "concurrently --kill-others --handle-input \"npm run dev:server\" \"npm run dev:ui\"",
         "dev:server": "cross-env NODE_ENV=development nodemon main.js",
         "dev:ui": "vite",
         "build:ui": "vite build",
