@@ -1,6 +1,6 @@
 /**
  * File: src/auth/authSource.js
- * Description: Authentication source manager that loads and validates authentication data from environment variables or config files
+ * Description: Authentication source manager that loads and validates authentication data from config files
  *
  * Maintainers: iBenzene, bbbugg
  * Original Author: Ellinav
@@ -11,7 +11,7 @@ const path = require("path");
 
 /**
  * Authentication Source Management Module
- * Responsible for loading and managing authentication information from environment variables or file system
+ * Responsible for loading and managing authentication information from the file system
  */
 class AuthSource {
     constructor(logger) {
@@ -22,22 +22,15 @@ class AuthSource {
         this.accountNameMap = new Map();
         this.lastScannedIndices = "[]"; // Cache to track changes
 
-        if (process.env.AUTH_JSON_0 || process.env.AUTH_JSON_1) {
-            this.authMode = "env";
-            this.logger.info(
-                "[Auth] Detected AUTH_JSON_* environment variables, switching to environment variable authentication mode."
-            );
-        } else {
-            this.logger.info(
-                '[Auth] No environment variable authentication detected, will use files in "configs/auth/" directory.'
-            );
-        }
+        this.logger.info(
+            '[Auth] Using files in "configs/auth/" directory for authentication.'
+        );
 
         this.reloadAuthSources(true); // Initial load
 
         if (this.availableIndices.length === 0) {
             this.logger.warn(
-                `[Auth] No valid authentication sources found in '${this.authMode}' mode. The server will start in account binding mode.`
+                `[Auth] No valid authentication sources found in 'file' mode. The server will start in account binding mode.`
             );
         }
     }
@@ -57,9 +50,6 @@ class AuthSource {
     }
 
     removeAuth(index) {
-        if (this.authMode !== "file") {
-            throw new Error("Account deletion is only supported when using file-based auth.");
-        }
         if (!Number.isInteger(index)) {
             throw new Error("Invalid account index.");
         }
@@ -83,33 +73,23 @@ class AuthSource {
 
     _discoverAvailableIndices() {
         let indices = [];
-        if (this.authMode === "env") {
-            const regex = /^AUTH_JSON_(\d+)$/;
-            for (const key in process.env) {
-                const match = key.match(regex);
-                if (match && match[1]) {
-                    indices.push(parseInt(match[1], 10));
-                }
-            }
-        } else {
-            const configDir = path.join(process.cwd(), "configs", "auth");
-            if (!fs.existsSync(configDir)) {
-                this.availableIndices = [];
-                this.initialIndices = [];
-                return;
-            }
-            try {
-                const files = fs.readdirSync(configDir);
-                const authFiles = files.filter(file => /^auth-\d+\.json$/.test(file));
-                indices = authFiles.map(file =>
-                    parseInt(file.match(/^auth-(\d+)\.json$/)[1], 10)
-                );
-            } catch (error) {
-                this.logger.error(`[Auth] Failed to scan "configs/auth/" directory: ${error.message}`);
-                this.availableIndices = [];
-                this.initialIndices = [];
-                return;
-            }
+        const configDir = path.join(process.cwd(), "configs", "auth");
+        if (!fs.existsSync(configDir)) {
+            this.availableIndices = [];
+            this.initialIndices = [];
+            return;
+        }
+        try {
+            const files = fs.readdirSync(configDir);
+            const authFiles = files.filter(file => /^auth-\d+\.json$/.test(file));
+            indices = authFiles.map(file =>
+                parseInt(file.match(/^auth-(\d+)\.json$/)[1], 10)
+            );
+        } catch (error) {
+            this.logger.error(`[Auth] Failed to scan "configs/auth/" directory: ${error.message}`);
+            this.availableIndices = [];
+            this.initialIndices = [];
+            return;
         }
 
         this.initialIndices = [...new Set(indices)].sort((a, b) => a - b);
@@ -157,16 +137,12 @@ class AuthSource {
     }
 
     _getAuthContent(index) {
-        if (this.authMode === "env") {
-            return process.env[`AUTH_JSON_${index}`];
-        } else {
-            const authFilePath = path.join(process.cwd(), "configs", "auth", `auth-${index}.json`);
-            if (!fs.existsSync(authFilePath)) return null;
-            try {
-                return fs.readFileSync(authFilePath, "utf-8");
-            } catch (e) {
-                return null;
-            }
+        const authFilePath = path.join(process.cwd(), "configs", "auth", `auth-${index}.json`);
+        if (!fs.existsSync(authFilePath)) return null;
+        try {
+            return fs.readFileSync(authFilePath, "utf-8");
+        } catch (e) {
+            return null;
         }
     }
 

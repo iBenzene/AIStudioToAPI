@@ -150,10 +150,7 @@ class BrowserManager {
             this.logger.info("[Browser] Old API context closed.");
         }
 
-        const sourceDescription
-            = this.authSource.authMode === "env"
-                ? `Environment variable AUTH_JSON_${authIndex}`
-                : `File auth-${authIndex}.json`;
+        const sourceDescription = `File auth-${authIndex}.json`;
         this.logger.info("==================================================");
         this.logger.info(
             `🔄 [Browser] Creating new API browser context for account #${authIndex}`
