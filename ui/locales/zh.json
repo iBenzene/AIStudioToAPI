@@ -17,6 +17,8 @@
     "authAuthFailedDetail": "服务器拒绝了密码。",
     "authBack": "返回",
     "authBackspace": "退格",
+    "authConnectionFailedWs": "连接失败：WebSocket 握手被拒绝",
+    "authConnectionFailedWsDetail": "由于 <b>WebSocket 升级请求被拒绝 (400)</b>，无法连接至 VNC 服务器。<br><br>如果您正在使用 Nginx 或其他代理，这通常是因为<b>未正确配置 Upgrade 标头转发</b>导致的。<br>请检查您的代理配置并确保包含了 <code>proxy_set_header Upgrade $http_upgrade;</code>。",
     "authDontShowAgain": "不再显示",
     "authEnterAccountName": "无法自动检测电子邮件。请为此账号输入名称：",
     "authInputText": "输入文本",

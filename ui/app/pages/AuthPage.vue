@@ -433,6 +433,18 @@ const loadVncClient = async (vncContainer, vncSurface) => {
         });
 
         rfb.value.addEventListener("disconnect", e => {
+            // Check if we never connected (immediate failure)
+            if (!isConnected.value) {
+                console.warn("[VNC] Connection failed immediately. Likely WebSocket handshake failure (400/404).");
+                setStatus({
+                    detail: { key: "authConnectionFailedWsDetail" },
+                    reload: true,
+                    title: { key: "authConnectionFailedWs" },
+                    tone: "error",
+                });
+                return;
+            }
+
             isConnected.value = false;
             const detail = e && e.detail ? e.detail : {};
             const reason = detail.clean

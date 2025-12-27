@@ -17,6 +17,8 @@
     "authAuthFailedDetail": "The password was rejected by the server.",
     "authBack": "Back",
     "authBackspace": "Backspace",
+    "authConnectionFailedWs": "Connection Failed: WebSocket Handshake Rejected",
+    "authConnectionFailedWsDetail": "Unable to connect to VNC server because the <b>WebSocket upgrade request was rejected (400)</b>.<br><br>If you are using Nginx or another proxy, this is likely due to <b>missing Upgrade header configuration</b>.<br>Please ensure your proxy config includes <code>proxy_set_header Upgrade $http_upgrade;</code>.",
     "authDontShowAgain": "Don't show again",
     "authEnterAccountName": "Could not automatically detect email. Please enter a name for this account:",
     "authInputText": "Input text",

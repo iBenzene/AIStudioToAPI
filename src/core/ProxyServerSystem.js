@@ -336,6 +336,16 @@ class ProxyServerSystem extends EventEmitter {
             this.requestHandler.processOpenAIRequest(req, res);
         });
 
+        // VNC WebSocket downgrade / missing headers handler
+        // If Nginx or another proxy strips "Upgrade: websocket" headers, the request appears as a normal GET.
+        // We intercept it here to prevent it from falling through to the Gemini proxy.
+        app.get("/vnc", (req, res) => {
+            res.status(400).send(
+                "Error: WebSocket connection failed. " +
+                    "If you are using a proxy (like Nginx), ensure it is configured to forward 'Upgrade' and 'Connection' headers."
+            );
+        });
+
         app.all(/(.*)/, (req, res) => {
             this.requestHandler.processRequest(req, res);
         });
