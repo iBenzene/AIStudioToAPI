@@ -228,6 +228,59 @@ class StatusRoutes {
             this.logger.info(`[WebUI] Force URL context toggle switched to: ${statusText}`);
             res.status(200).json({ message: "settingUpdateSuccess", setting: "forceUrlContext", value: statusText });
         });
+
+        app.post("/api/files", isAuthenticated, (req, res) => {
+            const { content } = req.body;
+            // Ignore req.body.filename - auto rename
+
+            if (!content) {
+                return res.status(400).json({ error: "Missing content" });
+            }
+
+            try {
+                // Ensure directory exists
+                const configDir = path.join(process.cwd(), "configs", "auth");
+                if (!fs.existsSync(configDir)) {
+                    fs.mkdirSync(configDir, { recursive: true });
+                }
+
+                // If content is object, stringify it
+                const fileContent = typeof content === "object" ? JSON.stringify(content, null, 2) : content;
+
+                // Find next available index
+                let nextAuthIndex = 0;
+                while (fs.existsSync(path.join(configDir, `auth-${nextAuthIndex}.json`))) {
+                    nextAuthIndex++;
+                }
+
+                const newFilename = `auth-${nextAuthIndex}.json`;
+                const filePath = path.join(configDir, newFilename);
+
+                fs.writeFileSync(filePath, fileContent);
+
+                // Reload auth sources to pick up changes
+                this.serverSystem.authSource.reloadAuthSources();
+
+                this.logger.info(`[WebUI] File uploaded via API: generated ${newFilename}`);
+                res.status(200).json({ filename: newFilename, message: "File uploaded successfully" });
+            } catch (error) {
+                this.logger.error(`[WebUI] Failed to write file: ${error.message}`);
+                res.status(500).json({ error: "Failed to save file" });
+            }
+        });
+
+        app.get("/api/files/:filename", isAuthenticated, (req, res) => {
+            const filename = req.params.filename;
+            // Security check
+            if (!/^[a-zA-Z0-9.-]+$/.test(filename) || filename.includes("..")) {
+                return res.status(400).json({ error: "Invalid filename" });
+            }
+            const filePath = path.join(process.cwd(), "configs", "auth", filename);
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({ error: "File not found" });
+            }
+            res.download(filePath);
+        });
     }
 
     /**
