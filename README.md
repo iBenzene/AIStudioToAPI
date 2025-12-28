@@ -116,6 +116,8 @@ Stop the service:
 sudo docker compose down
 ```
 
+**Proxy Configuration (Optional):** If you need to use a proxy to access Google services, add `-e HTTP_PROXY=http://your-proxy:port -e HTTPS_PROXY=http://your-proxy:port` to the Docker command, or add these environment variables to your `docker-compose.yml`.
+
 #### 🔑 Step 2: Account Management
 
 After deployment, you need to add Google accounts using one of these methods:
@@ -140,7 +142,7 @@ If you need to access via a domain name or want unified management at the revers
 
 > 📖 For detailed Nginx configuration instructions, see: [Nginx Reverse Proxy Configuration](docs/en/nginx-setup.md)
 
-### 🐾 Cloud Deployment (Claw Cloud)
+### 🐾 Claw Cloud Run Deployment
 
 Deploy directly on Claw Cloud Run, a fully managed container platform.
 

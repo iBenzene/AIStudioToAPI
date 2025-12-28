@@ -116,6 +116,8 @@ sudo docker compose logs -f
 sudo docker compose down
 ```
 
+**代理配置（可选）：** 如需使用代理访问 Google 服务，在 Docker 命令中添加 `-e HTTP_PROXY=http://your-proxy:port -e HTTPS_PROXY=http://your-proxy:port`，或在 `docker-compose.yml` 的 `environment` 中添加这两个环境变量。
+
 #### 🔑 步骤 2：账号管理
 
 部署后，您需要使用以下方式之一添加 Google 账号：
@@ -140,7 +142,7 @@ sudo docker compose down
 
 > 📖 详细的 Nginx 配置说明请参阅：[Nginx 反向代理配置文档](docs/zh/nginx-setup.md)
 
-### 🐾 云端部署（Claw Cloud）
+### 🐾 Claw Cloud Run 部署
 
 支持直接部署到 Claw Cloud Run，全托管的容器平台。
 
