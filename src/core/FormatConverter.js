@@ -46,6 +46,66 @@ class FormatConverter {
         for (const message of conversationMessages) {
             const googleParts = [];
 
+            // Handle tool role (function execution result)
+            if (message.role === "tool") {
+                // Convert OpenAI tool response to Gemini functionResponse
+                let responseContent;
+                try {
+                    responseContent =
+                        typeof message.content === "string" ? JSON.parse(message.content) : message.content;
+                } catch (e) {
+                    // If content is not valid JSON, wrap it
+                    responseContent = { result: message.content };
+                }
+
+                googleParts.push({
+                    functionResponse: {
+                        name: message.name || message.tool_call_id || "unknown_function",
+                        response: responseContent,
+                    },
+                });
+
+                googleContents.push({
+                    parts: googleParts,
+                    role: "user", // Gemini expects function responses as "user" role
+                });
+                continue;
+            }
+
+            // Handle assistant messages with tool_calls
+            if (message.role === "assistant" && message.tool_calls && Array.isArray(message.tool_calls)) {
+                // Convert OpenAI tool_calls to Gemini functionCall
+                for (const toolCall of message.tool_calls) {
+                    if (toolCall.type === "function" && toolCall.function) {
+                        let args;
+                        try {
+                            args =
+                                typeof toolCall.function.arguments === "string"
+                                    ? JSON.parse(toolCall.function.arguments)
+                                    : toolCall.function.arguments;
+                        } catch (e) {
+                            args = {};
+                        }
+
+                        googleParts.push({
+                            functionCall: {
+                                args,
+                                name: toolCall.function.name,
+                            },
+                        });
+                    }
+                }
+
+                if (googleParts.length > 0) {
+                    googleContents.push({
+                        parts: googleParts,
+                        role: "model",
+                    });
+                }
+                continue;
+            }
+
+            // Handle regular text content
             if (typeof message.content === "string") {
                 googleParts.push({ text: message.content });
             } else if (Array.isArray(message.content)) {
@@ -94,17 +154,19 @@ class FormatConverter {
                 }
             }
 
-            googleContents.push({
-                parts: googleParts,
-                role: message.role === "assistant" ? "model" : "user",
-            });
+            if (googleParts.length > 0) {
+                googleContents.push({
+                    parts: googleParts,
+                    role: message.role === "assistant" ? "model" : "user",
+                });
+            }
         }
 
         // Build Google request
         const googleRequest = {
             contents: googleContents,
             ...(systemInstruction && {
-                systemInstruction: { parts: systemInstruction.parts },
+                systemInstruction: { parts: systemInstruction.parts, role: "user" },
             }),
         };
 
@@ -167,6 +229,94 @@ class FormatConverter {
         }
 
         googleRequest.generationConfig = generationConfig;
+
+        // Convert OpenAI tools to Gemini functionDeclarations
+        const openaiTools = openaiBody.tools || openaiBody.functions;
+        if (openaiTools && Array.isArray(openaiTools) && openaiTools.length > 0) {
+            const functionDeclarations = [];
+
+            // Helper function to convert OpenAI parameter types to Gemini format (uppercase)
+            const convertParameterTypes = obj => {
+                if (!obj || typeof obj !== "object") return obj;
+
+                const result = Array.isArray(obj) ? [] : {};
+
+                for (const key of Object.keys(obj)) {
+                    if (key === "type" && typeof obj[key] === "string") {
+                        // Convert lowercase type to uppercase for Gemini
+                        result[key] = obj[key].toUpperCase();
+                    } else if (typeof obj[key] === "object" && obj[key] !== null) {
+                        result[key] = convertParameterTypes(obj[key]);
+                    } else {
+                        result[key] = obj[key];
+                    }
+                }
+
+                return result;
+            };
+
+            for (const tool of openaiTools) {
+                // Handle OpenAI tools format: { type: "function", function: {...} }
+                // Also handle legacy functions format: { name, description, parameters }
+                const funcDef = tool.function || tool;
+
+                if (funcDef && funcDef.name) {
+                    const declaration = {
+                        name: funcDef.name,
+                    };
+
+                    if (funcDef.description) {
+                        declaration.description = funcDef.description;
+                    }
+
+                    if (funcDef.parameters) {
+                        // Convert parameter types from lowercase to uppercase
+                        declaration.parameters = convertParameterTypes(funcDef.parameters);
+                    }
+
+                    functionDeclarations.push(declaration);
+                }
+            }
+
+            if (functionDeclarations.length > 0) {
+                if (!googleRequest.tools) {
+                    googleRequest.tools = [];
+                }
+                googleRequest.tools.push({ functionDeclarations });
+                this.logger.info(
+                    `[Adapter] Converted ${functionDeclarations.length} OpenAI tool(s) to Gemini functionDeclarations`
+                );
+            }
+        }
+
+        // Convert OpenAI tool_choice to Gemini toolConfig.functionCallingConfig
+        const toolChoice = openaiBody.tool_choice || openaiBody.function_call;
+        if (toolChoice) {
+            const functionCallingConfig = {};
+
+            if (toolChoice === "auto") {
+                functionCallingConfig.mode = "AUTO";
+            } else if (toolChoice === "none") {
+                functionCallingConfig.mode = "NONE";
+            } else if (toolChoice === "required") {
+                functionCallingConfig.mode = "ANY";
+            } else if (typeof toolChoice === "object") {
+                // Handle { type: "function", function: { name: "xxx" } }
+                // or legacy { name: "xxx" }
+                const funcName = toolChoice.function?.name || toolChoice.name;
+                if (funcName) {
+                    functionCallingConfig.mode = "ANY";
+                    functionCallingConfig.allowedFunctionNames = [funcName];
+                }
+            }
+
+            if (Object.keys(functionCallingConfig).length > 0) {
+                googleRequest.toolConfig = { functionCallingConfig };
+                this.logger.info(
+                    `[Adapter] Converted tool_choice to Gemini toolConfig: ${JSON.stringify(functionCallingConfig)}`
+                );
+            }
+        }
 
         // Force web search and URL context
         if (this.serverSystem.forceWebSearch || this.serverSystem.forceUrlContext) {
@@ -295,6 +445,38 @@ class FormatConverter {
                     delta.content = `![Generated Image](data:${image.mimeType};base64,${image.data})`;
                     this.logger.info("[Adapter] Successfully parsed image from streaming response chunk.");
                     hasContent = true;
+                } else if (part.functionCall) {
+                    // Convert Gemini functionCall to OpenAI tool_calls format
+                    const funcCall = part.functionCall;
+                    const toolCallId = `call_${this._generateRequestId()}`;
+
+                    // Track tool call index for multiple function calls
+                    const toolCallIndex = streamState?.toolCallIndex ?? 0;
+                    if (streamState) {
+                        streamState.toolCallIndex = toolCallIndex + 1;
+                    }
+
+                    delta.tool_calls = [
+                        {
+                            function: {
+                                arguments: JSON.stringify(funcCall.args || {}),
+                                name: funcCall.name,
+                            },
+                            id: toolCallId,
+                            index: toolCallIndex,
+                            type: "function",
+                        },
+                    ];
+
+                    // Mark that we have a function call for finish_reason
+                    if (streamState) {
+                        streamState.hasFunctionCall = true;
+                    }
+
+                    this.logger.info(
+                        `[Adapter] Converted Gemini functionCall to OpenAI tool_calls: ${funcCall.name} (index: ${toolCallIndex})`
+                    );
+                    hasContent = true;
                 }
 
                 if (hasContent) {
@@ -324,11 +506,28 @@ class FormatConverter {
 
         // Handle the final chunk with finish_reason and usage
         if (candidate.finishReason) {
+            // Determine the correct finish_reason for OpenAI format
+            let finishReason;
+            if (streamState?.hasFunctionCall) {
+                finishReason = "tool_calls";
+            } else {
+                // Map Gemini finishReason to OpenAI format
+                const reasonMap = {
+                    max_tokens: "length",
+                    other: "stop",
+                    recitation: "stop",
+                    safety: "content_filter",
+                    stop: "stop",
+                };
+                const lowerReason = candidate.finishReason.toLowerCase();
+                finishReason = reasonMap[lowerReason] || "stop";
+            }
+
             const finalResponse = {
                 choices: [
                     {
                         delta: {},
-                        finish_reason: candidate.finishReason,
+                        finish_reason: finishReason,
                         index: 0,
                     },
                 ],
@@ -380,6 +579,7 @@ class FormatConverter {
 
         let content = "";
         let reasoning_content = "";
+        const tool_calls = [];
 
         if (candidate.content && Array.isArray(candidate.content.parts)) {
             for (const part of candidate.content.parts) {
@@ -390,6 +590,18 @@ class FormatConverter {
                 } else if (part.inlineData) {
                     const image = part.inlineData;
                     content += `![Generated Image](data:${image.mimeType};base64,${image.data})`;
+                } else if (part.functionCall) {
+                    // Convert Gemini functionCall to OpenAI tool_calls format
+                    const funcCall = part.functionCall;
+                    tool_calls.push({
+                        function: {
+                            arguments: JSON.stringify(funcCall.args || {}),
+                            name: funcCall.name,
+                        },
+                        id: `call_${this._generateRequestId()}`,
+                        type: "function",
+                    });
+                    this.logger.info(`[Adapter] Converted Gemini functionCall to OpenAI tool_calls: ${funcCall.name}`);
                 }
             }
         }
@@ -398,11 +610,31 @@ class FormatConverter {
         if (reasoning_content) {
             message.reasoning_content = reasoning_content;
         }
+        if (tool_calls.length > 0) {
+            message.tool_calls = tool_calls;
+        }
+
+        // Determine finish_reason
+        let finishReason;
+        if (tool_calls.length > 0) {
+            finishReason = "tool_calls";
+        } else {
+            // Map Gemini finishReason to OpenAI format
+            const reasonMap = {
+                max_tokens: "length",
+                other: "stop",
+                recitation: "stop",
+                safety: "content_filter",
+                stop: "stop",
+            };
+            const lowerReason = (candidate.finishReason || "stop").toLowerCase();
+            finishReason = reasonMap[lowerReason] || "stop";
+        }
 
         return {
             choices: [
                 {
-                    finish_reason: candidate.finishReason || "stop",
+                    finish_reason: finishReason,
                     index: 0,
                     message,
                 },
