@@ -53,7 +53,7 @@ class WebRoutes {
                     sameSite: "lax",
                     // This allows HTTP access in production if HTTPS is not configured
                     // Set SECURE_COOKIES=true when using HTTPS/SSL
-                    secure: process.env.SECURE_COOKIES === "true",
+                    secure: process.env.SECURE_COOKIES?.toLowerCase() === "true",
                 },
                 resave: false,
                 saveUninitialized: false,

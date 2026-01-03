@@ -65,9 +65,10 @@ class ConfigLoader {
         if (process.env.API_KEYS) {
             config.apiKeys = process.env.API_KEYS.split(",");
         }
-        if (process.env.FORCE_THINKING) config.forceThinking = process.env.FORCE_THINKING === "true";
-        if (process.env.FORCE_WEB_SEARCH) config.forceWebSearch = process.env.FORCE_WEB_SEARCH === "true";
-        if (process.env.FORCE_URL_CONTEXT) config.forceUrlContext = process.env.FORCE_URL_CONTEXT === "true";
+        if (process.env.FORCE_THINKING) config.forceThinking = process.env.FORCE_THINKING.toLowerCase() === "true";
+        if (process.env.FORCE_WEB_SEARCH) config.forceWebSearch = process.env.FORCE_WEB_SEARCH.toLowerCase() === "true";
+        if (process.env.FORCE_URL_CONTEXT)
+            config.forceUrlContext = process.env.FORCE_URL_CONTEXT.toLowerCase() === "true";
 
         let rawCodes = process.env.IMMEDIATE_SWITCH_STATUS_CODES;
         let codesSource = "environment variable";
