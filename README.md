@@ -132,7 +132,9 @@ After deployment, you need to add Google accounts using one of these methods:
 **Method 2: Upload Auth Files**
 
 - Run `npm run setup-auth` on a Windows machine to generate auth files
-- Upload `auth-N.json` files (N starts from 0) directly through the web console in your browser, or manually upload to the mounted `/path/to/auth` directory
+- In the web console, click "Upload Auth" to upload the auth JSON file, or manually upload to the mounted `/path/to/auth` directory
+
+> 💡 **Tip**: You can also download auth files from an existing server and upload them to a new server. Click the "Download Auth" button for the corresponding account in the web console to download the auth file.
 
 > ⚠ Environment variable-based auth injection is no longer supported.
 
@@ -147,6 +149,14 @@ If you need to access via a domain name or want unified management at the revers
 Deploy directly on Claw Cloud Run, a fully managed container platform.
 
 > 📖 For detailed deployment instructions, see: [Deploy on Claw Cloud Run](docs/en/claw-cloud-run.md)
+
+### 🦓 Zeabur Deployment
+
+Deploy on the Zeabur container platform.
+
+> ⚠ **Note:** Zeabur's free tier provides only $5 credits per month, which is not enough to run 24/7. Please pause the service when not in use!
+
+> 📖 For detailed deployment instructions, see: [Deploy on Zeabur](docs/en/zeabur.md)
 
 ## 📡 API Usage
 

@@ -41,6 +41,23 @@ This guide will help you deploy the `aistudio-to-api` service on [Claw Cloud Run
 2. Copy the **Public Address** (URL).
 3. Access the URL in your browser. You will need to enter the `API_KEYS` you configured to access the management console.
 
+## 🔑 Account Management
+
+After deployment, you need to add Google accounts. There are two methods:
+
+**Method 1: VNC-Based Login (Recommended)**
+
+- Access the deployed service address in your browser and click the "Add User" button
+- You'll be redirected to a VNC page with a browser instance
+- Log in to your Google account, then click the "Save" button after login is complete
+
+**Method 2: Upload Auth Files**
+
+- Run `npm run setup-auth` on a Windows machine to generate auth files
+- In the web console, click "Upload Auth" to upload the auth JSON file
+
+> 💡 **Tip**: You can also download auth files from an existing server and upload them to a new server. Click the "Download Auth" button for the corresponding account in the web console to download the auth file.
+
 ## 🔌 API Endpoints
 
 After deployment, you can access the API using the **Public Address** combined with the following Base URLs:
@@ -49,3 +66,7 @@ After deployment, you can access the API using the **Public Address** combined w
 - **Gemini Compatible Base URL**: `https://<your-public-address>/v1beta`
 
 > For more details, please refer to the [API Usage](../../README.md#-api-usage) section in the main README.
+
+## 🔄 Updating the Application
+
+To update to the latest version, click the **Update** button in the top right corner of the App details page.
