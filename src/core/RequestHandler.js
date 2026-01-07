@@ -979,6 +979,12 @@ class RequestHandler {
             }
         }
 
+        // Ensure thoughtSignature is present for functionCall/functionResponse in native Google requests
+        // This uses a dummy placeholder to skip validation for official Gemini API
+        if (req.method === "POST" && bodyObj && bodyObj.contents) {
+            this.formatConverter.ensureThoughtSignature(bodyObj);
+        }
+
         // Force web search and URL context for native Google requests
         if (
             (this.serverSystem.forceWebSearch || this.serverSystem.forceUrlContext) &&

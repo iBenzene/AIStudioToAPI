@@ -20,6 +20,50 @@ class FormatConverter {
     }
 
     /**
+     * Ensure thoughtSignature is present in Gemini native format requests
+     * This handles direct Gemini API calls where functionCall/functionResponse may lack thoughtSignature
+     * @param {object} geminiBody - Gemini API request body
+     * @returns {object} - Modified request body with thoughtSignature placeholders
+     */
+    ensureThoughtSignature(geminiBody) {
+        if (!geminiBody || !geminiBody.contents || !Array.isArray(geminiBody.contents)) {
+            return geminiBody;
+        }
+
+        const DUMMY_SIGNATURE = "context_engineering_is_the_way_to_go";
+
+        for (const content of geminiBody.contents) {
+            if (!content.parts || !Array.isArray(content.parts)) continue;
+
+            let signatureAdded = false;
+            for (const part of content.parts) {
+                // Check for functionCall without thoughtSignature
+                if (part.functionCall && !part.thoughtSignature) {
+                    if (!signatureAdded) {
+                        part.thoughtSignature = DUMMY_SIGNATURE;
+                        signatureAdded = true;
+                        this.logger.info(
+                            `[Adapter] Added dummy thoughtSignature for functionCall: ${part.functionCall.name}`
+                        );
+                    }
+                }
+                // Check for functionResponse without thoughtSignature
+                if (part.functionResponse && !part.thoughtSignature) {
+                    if (!signatureAdded) {
+                        part.thoughtSignature = DUMMY_SIGNATURE;
+                        signatureAdded = true;
+                        this.logger.info(
+                            `[Adapter] Added dummy thoughtSignature for functionResponse: ${part.functionResponse.name}`
+                        );
+                    }
+                }
+            }
+        }
+
+        return geminiBody;
+    }
+
+    /**
      * Convert OpenAI request format to Google Gemini format
      */
     async translateOpenAIToGoogle(openaiBody) {
