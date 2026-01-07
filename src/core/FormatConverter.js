@@ -17,12 +17,6 @@ class FormatConverter {
     constructor(logger, serverSystem) {
         this.logger = logger;
         this.serverSystem = serverSystem;
-        // Cache for storing thoughtSignature from Gemini responses
-        // This allows multi-turn tool calling without client-side support
-        // Key: tool_call_id, Value: thoughtSignature
-        this.thoughtSignatureCache = new Map();
-        // Max cache size to prevent memory leak
-        this.maxCacheSize = 1000;
     }
 
     /**
@@ -31,6 +25,8 @@ class FormatConverter {
     async translateOpenAIToGoogle(openaiBody) {
         // eslint-disable-line no-unused-vars
         this.logger.info("[Adapter] Starting translation of OpenAI request format to Google format...");
+        // [DEBUG] Log incoming messages for troubleshooting
+        this.logger.info(`[Adapter] Debug: incoming messages = ${JSON.stringify(openaiBody.messages, null, 2)}`);
 
         let systemInstruction = null;
         const googleContents = [];
@@ -47,48 +43,6 @@ class FormatConverter {
 
         // Convert conversation messages
         const conversationMessages = openaiBody.messages.filter(msg => msg.role !== "system");
-
-        // Build toolIdToInfoMap from assistant messages with tool_calls
-        // This maps tool_call_id to {name, thoughtSignature} for later use when processing tool responses
-        const toolIdToInfoMap = new Map();
-        for (const message of conversationMessages) {
-            if (message.role === "assistant" && message.tool_calls && Array.isArray(message.tool_calls)) {
-                for (const toolCall of message.tool_calls) {
-                    if (toolCall.id && toolCall.function?.name) {
-                        // Extract thoughtSignature from tool_call_id if encoded (format: call_xxx::sig::base64)
-                        let signature = toolCall.thoughtSignature || null;
-                        let cleanId = toolCall.id;
-
-                        if (toolCall.id.includes("::sig::")) {
-                            const parts = toolCall.id.split("::sig::");
-                            cleanId = parts[0];
-                            try {
-                                signature = Buffer.from(parts[1], "base64").toString("utf-8");
-                                this.logger.info(`[Adapter] Extracted thoughtSignature from tool_call_id: ${cleanId}`);
-                            } catch (e) {
-                                this.logger.warn(`[Adapter] Failed to decode thoughtSignature from tool_call_id`);
-                            }
-                        }
-
-                        // Fallback: try server cache
-                        if (!signature) {
-                            const cachedSignature = this.thoughtSignatureCache.get(toolCall.id);
-                            if (cachedSignature) {
-                                signature = cachedSignature;
-                                this.logger.info(
-                                    `[Adapter] Retrieved thoughtSignature from server cache for: ${toolCall.id}`
-                                );
-                            }
-                        }
-
-                        toolIdToInfoMap.set(toolCall.id, {
-                            name: toolCall.function.name,
-                            thoughtSignature: signature,
-                        });
-                    }
-                }
-            }
-        }
 
         // Buffer for accumulating consecutive tool message parts
         // Gemini requires alternating roles, so consecutive tool messages must be merged
@@ -134,9 +88,8 @@ class FormatConverter {
                     responseContent = { result: message.content };
                 }
 
-                // Resolve function name and thoughtSignature from toolIdToInfoMap
-                const toolInfo = message.tool_call_id && toolIdToInfoMap.get(message.tool_call_id);
-                const functionName = message.name || toolInfo?.name || "unknown_function";
+                // Use function name from tool message (OpenAI format always includes name)
+                const functionName = message.name || "unknown_function";
 
                 // Add to buffer instead of pushing directly
                 // This allows merging consecutive tool messages into one user message
@@ -147,10 +100,10 @@ class FormatConverter {
                     },
                 };
                 // Pass back thoughtSignature from the corresponding tool_call for Gemini 3
-                if (toolInfo?.thoughtSignature) {
-                    functionResponsePart.thoughtSignature = toolInfo.thoughtSignature;
-                    this.logger.info(`[Adapter] Attached thoughtSignature to functionResponse: ${functionName}`);
-                }
+                // [PLACEHOLDER MODE] - Use dummy signature to skip validation for official Gemini API testing
+                // Official dummy signatures: "context_engineering_is_the_way_to_go" or "skip_thought_signature_validator"
+                functionResponsePart.thoughtSignature = "context_engineering_is_the_way_to_go";
+                this.logger.info(`[Adapter] Using dummy thoughtSignature for functionResponse: ${functionName}`);
                 pendingToolParts.push(functionResponsePart);
                 continue;
             }
@@ -182,11 +135,12 @@ class FormatConverter {
                             },
                         };
                         // Pass back thoughtSignature only on the FIRST functionCall
-                        if (toolCall.thoughtSignature && !signatureAttachedToCall) {
-                            functionCallPart.thoughtSignature = toolCall.thoughtSignature;
+                        // [PLACEHOLDER MODE] - Use dummy signature to skip validation for official Gemini API testing
+                        if (!signatureAttachedToCall) {
+                            functionCallPart.thoughtSignature = "context_engineering_is_the_way_to_go";
                             signatureAttachedToCall = true;
                             this.logger.info(
-                                `[Adapter] Attached thoughtSignature to first functionCall: ${toolCall.function.name}`
+                                `[Adapter] Using dummy thoughtSignature for first functionCall: ${toolCall.function.name}`
                             );
                         }
                         googleParts.push(functionCallPart);
@@ -259,6 +213,8 @@ class FormatConverter {
 
         // Build Google request
         this.logger.info(`[Adapter] Debug: googleContents length = ${googleContents.length}`);
+        // [DEBUG] Log full googleContents for troubleshooting thoughtSignature issue
+        this.logger.info(`[Adapter] Debug: googleContents = ${JSON.stringify(googleContents, null, 2)}`);
         const googleRequest = {
             contents: googleContents,
             ...(systemInstruction && {
@@ -582,17 +538,7 @@ class FormatConverter {
                 } else if (part.functionCall) {
                     // Convert Gemini functionCall to OpenAI tool_calls format
                     const funcCall = part.functionCall;
-                    let toolCallId = `call_${this._generateRequestId()}`;
-
-                    // Encode thoughtSignature into tool_call_id for reliable pass-through
-                    // Format: call_xxx::sig::base64(signature)
-                    if (part.thoughtSignature) {
-                        const encodedSig = Buffer.from(part.thoughtSignature).toString("base64");
-                        toolCallId = `${toolCallId}::sig::${encodedSig}`;
-                        this.logger.info(`[Adapter] Encoded thoughtSignature into tool_call_id for: ${funcCall.name}`);
-                        // Also cache for backward compatibility
-                        this._cacheThoughtSignature(toolCallId, part.thoughtSignature);
-                    }
+                    const toolCallId = `call_${this._generateRequestId()}`;
 
                     // Track tool call index for multiple function calls
                     const toolCallIndex = streamState?.toolCallIndex ?? 0;
@@ -736,17 +682,7 @@ class FormatConverter {
                 } else if (part.functionCall) {
                     // Convert Gemini functionCall to OpenAI tool_calls format
                     const funcCall = part.functionCall;
-                    let toolCallId = `call_${this._generateRequestId()}`;
-
-                    // Encode thoughtSignature into tool_call_id for reliable pass-through
-                    // Format: call_xxx::sig::base64(signature)
-                    if (part.thoughtSignature) {
-                        const encodedSig = Buffer.from(part.thoughtSignature).toString("base64");
-                        toolCallId = `${toolCallId}::sig::${encodedSig}`;
-                        this.logger.info(`[Adapter] Encoded thoughtSignature into tool_call_id for: ${funcCall.name}`);
-                        // Also cache for backward compatibility
-                        this._cacheThoughtSignature(toolCallId, part.thoughtSignature);
-                    }
+                    const toolCallId = `call_${this._generateRequestId()}`;
 
                     const toolCallObj = {
                         function: {
@@ -802,21 +738,6 @@ class FormatConverter {
             object: "chat.completion",
             usage: this._parseUsage(googleResponse),
         };
-    }
-
-    /**
-     * Cache thoughtSignature for server-side storage
-     * This allows multi-turn tool calling without client-side support
-     */
-    _cacheThoughtSignature(toolCallId, signature) {
-        // Clean up old entries if cache is too large
-        if (this.thoughtSignatureCache.size >= this.maxCacheSize) {
-            // Remove oldest entries (first 100)
-            const keysToDelete = Array.from(this.thoughtSignatureCache.keys()).slice(0, 100);
-            keysToDelete.forEach(key => this.thoughtSignatureCache.delete(key));
-            this.logger.info(`[Adapter] Cleaned up ${keysToDelete.length} old entries from thoughtSignature cache`);
-        }
-        this.thoughtSignatureCache.set(toolCallId, signature);
     }
 
     _generateRequestId() {
