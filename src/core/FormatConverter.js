@@ -21,7 +21,8 @@ class FormatConverter {
 
     /**
      * Ensure thoughtSignature is present in Gemini native format requests
-     * This handles direct Gemini API calls where functionCall/functionResponse may lack thoughtSignature
+     * This handles direct Gemini API calls where functionCall may lack thoughtSignature
+     * Note: Only functionCall needs thoughtSignature, functionResponse does NOT need it
      * @param {object} geminiBody - Gemini API request body
      * @returns {object} - Modified request body with thoughtSignature placeholders
      */
@@ -35,6 +36,7 @@ class FormatConverter {
         for (const content of geminiBody.contents) {
             if (!content.parts || !Array.isArray(content.parts)) continue;
 
+            // Only add signature to functionCall, not functionResponse
             let signatureAdded = false;
             for (const part of content.parts) {
                 // Check for functionCall without thoughtSignature
@@ -47,16 +49,7 @@ class FormatConverter {
                         );
                     }
                 }
-                // Check for functionResponse without thoughtSignature
-                if (part.functionResponse && !part.thoughtSignature) {
-                    if (!signatureAdded) {
-                        part.thoughtSignature = DUMMY_SIGNATURE;
-                        signatureAdded = true;
-                        this.logger.info(
-                            `[Adapter] Added dummy thoughtSignature for functionResponse: ${part.functionResponse.name}`
-                        );
-                    }
-                }
+                // Note: functionResponse does NOT need thoughtSignature per official docs
             }
         }
 
@@ -93,21 +86,9 @@ class FormatConverter {
         let pendingToolParts = [];
 
         // Helper function to flush pending tool parts as a single user message
-        // For Gemini 3: thoughtSignature should only be on the FIRST functionResponse part
+        // Note: functionResponse does NOT need thoughtSignature per official docs
         const flushToolParts = () => {
             if (pendingToolParts.length > 0) {
-                // Ensure only the first part has thoughtSignature
-                let signatureAttached = false;
-                for (const part of pendingToolParts) {
-                    if (part.thoughtSignature) {
-                        if (signatureAttached) {
-                            // Remove signature from subsequent parts
-                            delete part.thoughtSignature;
-                        } else {
-                            signatureAttached = true;
-                        }
-                    }
-                }
                 googleContents.push({
                     parts: pendingToolParts,
                     role: "user", // Gemini expects function responses as "user" role
@@ -137,17 +118,13 @@ class FormatConverter {
 
                 // Add to buffer instead of pushing directly
                 // This allows merging consecutive tool messages into one user message
+                // Note: functionResponse does NOT need thoughtSignature per official docs
                 const functionResponsePart = {
                     functionResponse: {
                         name: functionName,
                         response: responseContent,
                     },
                 };
-                // Pass back thoughtSignature from the corresponding tool_call for Gemini 3
-                // [PLACEHOLDER MODE] - Use dummy signature to skip validation for official Gemini API testing
-                // Official dummy signatures: "context_engineering_is_the_way_to_go" or "skip_thought_signature_validator"
-                functionResponsePart.thoughtSignature = "context_engineering_is_the_way_to_go";
-                this.logger.info(`[Adapter] Using dummy thoughtSignature for functionResponse: ${functionName}`);
                 pendingToolParts.push(functionResponsePart);
                 continue;
             }
