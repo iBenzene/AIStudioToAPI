@@ -479,7 +479,7 @@ class FormatConverter {
      * @param {object} streamState - Optional state object to track thought mode
      */
     translateGoogleToOpenAIStream(googleChunk, modelName = "gemini-2.5-flash-lite", streamState = null) {
-        console.log(`[Adapter] Received Google chunk: ${googleChunk}`);
+        this.logger.info(`[Adapter] Received Google chunk: ${googleChunk}`);
 
         // Ensure streamState exists to properly track tool call indices
         if (!streamState) {
