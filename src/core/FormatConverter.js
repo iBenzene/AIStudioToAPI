@@ -14,6 +14,9 @@ const mime = require("mime-types");
  * Handles conversion between OpenAI and Google Gemini API formats
  */
 class FormatConverter {
+    // Placeholder signature for Gemini 3 functionCall validation
+    static DUMMY_THOUGHT_SIGNATURE = "context_engineering_is_the_way_to_go";
+
     constructor(logger, serverSystem) {
         this.logger = logger;
         this.serverSystem = serverSystem;
@@ -31,7 +34,7 @@ class FormatConverter {
             return geminiBody;
         }
 
-        const DUMMY_SIGNATURE = "context_engineering_is_the_way_to_go";
+        const DUMMY_SIGNATURE = FormatConverter.DUMMY_THOUGHT_SIGNATURE;
 
         for (const content of geminiBody.contents) {
             if (!content.parts || !Array.isArray(content.parts)) continue;
@@ -146,6 +149,9 @@ class FormatConverter {
                                     ? JSON.parse(toolCall.function.arguments)
                                     : toolCall.function.arguments;
                         } catch (e) {
+                            this.logger.warn(
+                                `[Adapter] Failed to parse tool function arguments for "${toolCall.function.name}": ${e.message}`
+                            );
                             args = {};
                         }
 
@@ -158,7 +164,7 @@ class FormatConverter {
                         // Pass back thoughtSignature only on the FIRST functionCall
                         // [PLACEHOLDER MODE] - Use dummy signature to skip validation for official Gemini API testing
                         if (!signatureAttachedToCall) {
-                            functionCallPart.thoughtSignature = "context_engineering_is_the_way_to_go";
+                            functionCallPart.thoughtSignature = FormatConverter.DUMMY_THOUGHT_SIGNATURE;
                             signatureAttachedToCall = true;
                             this.logger.info(
                                 `[Adapter] Using dummy thoughtSignature for first functionCall: ${toolCall.function.name}`
@@ -477,7 +483,10 @@ class FormatConverter {
 
         // Ensure streamState exists to properly track tool call indices
         if (!streamState) {
-            streamState = {}; // Create default state to avoid index conflicts
+            this.logger.warn(
+                "[Adapter] streamState not provided, creating default state. This may cause issues with tool call tracking."
+            );
+            streamState = {};
         }
         if (!googleChunk || googleChunk.trim() === "") {
             return null;
@@ -500,16 +509,16 @@ class FormatConverter {
             return null;
         }
 
-        if (streamState && !streamState.id) {
+        if (!streamState.id) {
             streamState.id = `chatcmpl-${this._generateRequestId()}`;
             streamState.created = Math.floor(Date.now() / 1000);
         }
-        const streamId = streamState ? streamState.id : `chatcmpl-${this._generateRequestId()}`;
-        const created = streamState ? streamState.created : Math.floor(Date.now() / 1000);
+        const streamId = streamState.id;
+        const created = streamState.created;
 
         // Cache usage data whenever it arrives.
         // Store in streamState to prevent concurrency issues between requests
-        if (googleResponse.usageMetadata && streamState) {
+        if (googleResponse.usageMetadata) {
             streamState.usage = this._parseUsage(googleResponse);
         }
 
@@ -545,7 +554,7 @@ class FormatConverter {
                 if (part.thought === true) {
                     if (part.text) {
                         delta.reasoning_content = part.text;
-                        if (streamState) streamState.inThought = true;
+                        streamState.inThought = true;
                         hasContent = true;
                     }
                 } else if (part.text) {
@@ -562,10 +571,8 @@ class FormatConverter {
                     const toolCallId = `call_${this._generateRequestId()}`;
 
                     // Track tool call index for multiple function calls
-                    const toolCallIndex = streamState?.toolCallIndex ?? 0;
-                    if (streamState) {
-                        streamState.toolCallIndex = toolCallIndex + 1;
-                    }
+                    const toolCallIndex = streamState.toolCallIndex ?? 0;
+                    streamState.toolCallIndex = toolCallIndex + 1;
 
                     const toolCallObj = {
                         function: {
@@ -580,9 +587,7 @@ class FormatConverter {
                     delta.tool_calls = [toolCallObj];
 
                     // Mark that we have a function call for finish_reason
-                    if (streamState) {
-                        streamState.hasFunctionCall = true;
-                    }
+                    streamState.hasFunctionCall = true;
 
                     this.logger.info(
                         `[Adapter] Converted Gemini functionCall to OpenAI tool_calls: ${funcCall.name} (index: ${toolCallIndex})`
@@ -592,7 +597,7 @@ class FormatConverter {
 
                 if (hasContent) {
                     // The 'role' should only be sent in the first chunk with content.
-                    if (streamState && !streamState.roleSent) {
+                    if (!streamState.roleSent) {
                         delta.role = "assistant";
                         streamState.roleSent = true;
                     }
@@ -619,19 +624,10 @@ class FormatConverter {
         if (candidate.finishReason) {
             // Determine the correct finish_reason for OpenAI format
             let finishReason;
-            if (streamState?.hasFunctionCall) {
+            if (streamState.hasFunctionCall) {
                 finishReason = "tool_calls";
             } else {
-                // Map Gemini finishReason to OpenAI format
-                const reasonMap = {
-                    max_tokens: "length",
-                    other: "stop",
-                    recitation: "stop",
-                    safety: "content_filter",
-                    stop: "stop",
-                };
-                const lowerReason = candidate.finishReason.toLowerCase();
-                finishReason = reasonMap[lowerReason] || "stop";
+                finishReason = this._mapFinishReason(candidate.finishReason);
             }
 
             const finalResponse = {
@@ -650,7 +646,7 @@ class FormatConverter {
             };
 
             // Attach cached usage data to the very last message
-            if (streamState && streamState.usage) {
+            if (streamState.usage) {
                 finalResponse.usage = streamState.usage;
             }
             chunksToSend.push(`data: ${JSON.stringify(finalResponse)}\n\n`);
@@ -733,16 +729,7 @@ class FormatConverter {
         if (tool_calls.length > 0) {
             finishReason = "tool_calls";
         } else {
-            // Map Gemini finishReason to OpenAI format
-            const reasonMap = {
-                max_tokens: "length",
-                other: "stop",
-                recitation: "stop",
-                safety: "content_filter",
-                stop: "stop",
-            };
-            const lowerReason = (candidate.finishReason || "stop").toLowerCase();
-            finishReason = reasonMap[lowerReason] || "stop";
+            finishReason = this._mapFinishReason(candidate.finishReason);
         }
 
         return {
@@ -759,6 +746,22 @@ class FormatConverter {
             object: "chat.completion",
             usage: this._parseUsage(googleResponse),
         };
+    }
+
+    /**
+     * Map Gemini finishReason to OpenAI format
+     * @param {string} geminiReason - Gemini finish reason
+     * @returns {string} - OpenAI finish reason
+     */
+    _mapFinishReason(geminiReason) {
+        const reasonMap = {
+            max_tokens: "length",
+            other: "stop",
+            recitation: "stop",
+            safety: "content_filter",
+            stop: "stop",
+        };
+        return reasonMap[(geminiReason || "stop").toLowerCase()] || "stop";
     }
 
     _generateRequestId() {
