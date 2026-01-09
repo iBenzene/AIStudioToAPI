@@ -415,6 +415,8 @@ class FormatConverter {
                         } else if (typeof obj[key] === "string") {
                             // Convert lowercase type to uppercase for Gemini
                             result[key] = obj[key].toUpperCase();
+                        } else if (typeof obj[key] === "object" && obj[key] !== null) {
+                            result[key] = convertParameterTypes(obj[key]);
                         } else {
                             result[key] = obj[key];
                         }
@@ -623,7 +625,6 @@ class FormatConverter {
                 if (part.thought === true) {
                     if (part.text) {
                         delta.reasoning_content = part.text;
-                        streamState.inThought = true;
                         hasContent = true;
                     }
                 } else if (part.text) {
