@@ -13,7 +13,8 @@
 class LoggingService {
     // Log levels: DEBUG < INFO < WARN < ERROR
     static LEVELS = { DEBUG: 0, ERROR: 3, INFO: 1, WARN: 2 };
-    static currentLevel = LoggingService.LEVELS.INFO; // Default to INFO
+    static currentLevel =
+        process.env.LOG_LEVEL?.toUpperCase() === "DEBUG" ? LoggingService.LEVELS.DEBUG : LoggingService.LEVELS.INFO;
 
     /**
      * Set the global log level

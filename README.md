@@ -189,9 +189,10 @@ sudo docker compose down
 | `HOST`                      | 服务器监听的主机地址。                                        | `0.0.0.0`            |
 | `ICON_URL`                  | 用于自定义控制台的 favicon 图标。支持 ICO, PNG, SVG 等格式。  | `/AIStudio_logo.svg` |
 | `SECURE_COOKIES`            | 是否启用安全 Cookie。`true` 表示仅支持 HTTPS 协议访问控制台。 | `false`              |
-| `RATE_LIMIT_MAX_ATTEMPTS`   | 时间窗口内控制台允许的最大失败登录尝试次数（设为 0 禁用）。   | `5`                  |
+| `RATE_LIMIT_MAX_ATTEMPTS`   | 时间窗口内控制台允许的最大失败登录尝试次数（设为 `0` 禁用）。 | `5`                  |
 | `RATE_LIMIT_WINDOW_MINUTES` | 速率限制的时间窗口长度（分钟）。                              | `15`                 |
 | `CHECK_UPDATE`              | 是否在页面加载时检查版本更新。设为 `false` 可禁用。           | `true`               |
+| `LOG_LEVEL`                 | 日志输出等级。设为 `DEBUG` 启用详细调试日志。                 | `INFO`               |
 
 #### 🌐 代理配置
 
@@ -200,8 +201,8 @@ sudo docker compose down
 | `INITIAL_AUTH_INDEX`            | 启动时使用的初始身份验证索引。                       | `0`       |
 | `MAX_RETRIES`                   | 请求失败后的最大重试次数（仅对假流式和非流式生效）。 | `3`       |
 | `RETRY_DELAY`                   | 两次重试之间的间隔（毫秒）。                         | `2000`    |
-| `SWITCH_ON_USES`                | 自动切换帐户前允许的请求次数（设为 0 禁用）。        | `40`      |
-| `FAILURE_THRESHOLD`             | 切换帐户前允许的连续失败次数（设为 0 禁用）。        | `3`       |
+| `SWITCH_ON_USES`                | 自动切换帐户前允许的请求次数（设为 `0` 禁用）。      | `40`      |
+| `FAILURE_THRESHOLD`             | 切换帐户前允许的连续失败次数（设为 `0` 禁用）。      | `3`       |
 | `IMMEDIATE_SWITCH_STATUS_CODES` | 触发立即切换帐户的 HTTP 状态码（逗号分隔）。         | `429,503` |
 
 #### 🗒️ 其他配置
