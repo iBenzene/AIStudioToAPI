@@ -11,6 +11,12 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 
+// Initialize language from environment variable passed by setupAuth.js
+const lang = process.env.SETUP_AUTH_LANG || "zh";
+
+// Bilingual text helper
+const getText = (zh, en) => (lang === "zh" ? zh : en);
+
 // --- Configuration Constants ---
 const getDefaultBrowserExecutablePath = () => {
     const platform = os.platform();
@@ -31,7 +37,12 @@ const CONFIG_DIR = "configs/auth"; // Authentication files directory
  */
 const ensureDirectoryExists = dirPath => {
     if (!fs.existsSync(dirPath)) {
-        console.log(`📂 Directory "${path.basename(dirPath)}" does not exist, creating...`);
+        console.log(
+            getText(
+                `📂 目录 "${path.basename(dirPath)}" 不存在，正在创建...`,
+                `📂 Directory "${path.basename(dirPath)}" does not exist, creating...`
+            )
+        );
         fs.mkdirSync(dirPath);
     }
 };
@@ -66,13 +77,28 @@ const getNextAuthIndex = () => {
     const newIndex = getNextAuthIndex();
     const authFileName = `auth-${newIndex}.json`;
 
-    console.log(`▶️  Preparing to create new authentication file for account #${newIndex}...`);
-    console.log(`▶️  Launching browser: ${browserExecutablePath}`);
+    console.log(
+        getText(
+            `▶️  正在准备为账号 #${newIndex} 创建新的认证文件...`,
+            `▶️  Preparing to create new authentication file for account #${newIndex}...`
+        )
+    );
+    console.log(getText(`▶️  启动浏览器: ${browserExecutablePath}`, `▶️  Launching browser: ${browserExecutablePath}`));
 
     if (!browserExecutablePath || !fs.existsSync(browserExecutablePath)) {
-        console.error("❌ Camoufox executable not found.");
-        console.error(`   -> Checked: ${browserExecutablePath || "(null)"}`);
-        console.error('   -> Please run "npm run setup-auth" first, or set CAMOUFOX_EXECUTABLE_PATH.');
+        console.error(getText("❌ 未找到 Camoufox 可执行文件。", "❌ Camoufox executable not found."));
+        console.error(
+            getText(
+                `   -> 检查路径: ${browserExecutablePath || "(null)"}`,
+                `   -> Checked: ${browserExecutablePath || "(null)"}`
+            )
+        );
+        console.error(
+            getText(
+                '   -> 请先运行 "npm run setup-auth"，或设置 CAMOUFOX_EXECUTABLE_PATH。',
+                '   -> Please run "npm run setup-auth" first, or set CAMOUFOX_EXECUTABLE_PATH.'
+            )
+        );
         process.exit(1);
     }
 
@@ -84,12 +110,31 @@ const getNextAuthIndex = () => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    console.log("\n--- Please complete the following steps in the newly opened Camoufox window ---");
+    console.log("");
     console.log(
-        "1. The browser will open Google AI Studio. Please log in to your Google account completely on the popup page."
+        getText(
+            "--- 请在新打开的 Camoufox 窗口中完成以下步骤 ---",
+            "--- Please complete the following steps in the newly opened Camoufox window ---"
+        )
     );
-    console.log("2. After successful login and seeing the AI Studio interface, do not close the browser window.");
-    console.log('3. Return to this terminal, then press "Enter" to continue...');
+    console.log(
+        getText(
+            "1. 浏览器将打开 Google AI Studio。请在弹出的页面上完整登录您的 Google 账号。",
+            "1. The browser will open Google AI Studio. Please log in to your Google account completely on the popup page."
+        )
+    );
+    console.log(
+        getText(
+            "2. 登录成功并看到 AI Studio 界面后，请不要关闭浏览器窗口。",
+            "2. After successful login and seeing the AI Studio interface, do not close the browser window."
+        )
+    );
+    console.log(
+        getText(
+            '3. 返回此终端，然后按 "回车键" 继续...',
+            '3. Return to this terminal, then press "Enter" to continue...'
+        )
+    );
 
     // <<< This is the only modification point: updated to Google AI Studio address >>>
     await page.goto("https://aistudio.google.com/u/0/prompts/new_chat");
@@ -100,12 +145,17 @@ const getNextAuthIndex = () => {
 
     let accountName = "unknown"; // Default value
     try {
-        console.log("🕵️  Attempting to retrieve account name (V3 - Scanning <script> JSON)...");
+        console.log(
+            getText(
+                "🕵️  正在尝试获取账号名称 (V3 - 扫描 <script> JSON)...",
+                "🕵️  Attempting to retrieve account name (V3 - Scanning <script> JSON)..."
+            )
+        );
 
         // 1. Locate all <script type="application/json"> tags
         const scriptLocators = page.locator('script[type="application/json"]');
         const count = await scriptLocators.count();
-        console.log(`   -> Found ${count} JSON <script> tags.`);
+        console.log(getText(`   -> 找到 ${count} 个 JSON <script> 标签。`, `   -> Found ${count} JSON <script> tags.`));
 
         // 2. Define a basic Email regular expression
         // It will match strings like "ouyang5453@gmail.com"
@@ -122,45 +172,92 @@ const getNextAuthIndex = () => {
                 if (match && match[0]) {
                     // 5. Found it!
                     accountName = match[0];
-                    console.log(`   -> Successfully retrieved account: ${accountName}`);
+                    console.log(
+                        getText(
+                            `   -> 成功获取账号: ${accountName}`,
+                            `   -> Successfully retrieved account: ${accountName}`
+                        )
+                    );
                     break; // Exit loop immediately after finding
                 }
             }
         }
 
         if (accountName === "unknown") {
-            console.log(`   -> Iterated through all ${count} <script> tags, but no Email found.`);
+            console.log(
+                getText(
+                    `   -> 已遍历所有 ${count} 个 <script> 标签，但未找到 Email。`,
+                    `   -> Iterated through all ${count} <script> tags, but no Email found.`
+                )
+            );
         }
     } catch (error) {
-        console.warn(`⚠️  Unable to automatically retrieve account name (error during V3 scan).`);
-        console.warn(`   -> Error: ${error.message}`);
-        console.warn(`   -> Will use "unknown" as account name.`);
+        console.warn(
+            getText(
+                "⚠️  无法自动获取账号名称 (V3 扫描出错)。",
+                "⚠️  Unable to automatically retrieve account name (error during V3 scan)."
+            )
+        );
+        console.warn(getText(`   -> 错误: ${error.message}`, `   -> Error: ${error.message}`));
+        console.warn(getText('   -> 将使用 "unknown" 作为账号名称。', '   -> Will use "unknown" as account name.'));
     }
 
     // ==================== Smart Validation and Dual-file Save Logic ====================
-    console.log("\nRetrieving and validating login status...");
+    console.log("");
+    console.log(getText("正在获取并验证登录状态...", "Retrieving and validating login status..."));
     const currentState = await context.storageState();
     currentState.accountName = accountName;
     const prettyStateString = JSON.stringify(currentState, null, 2);
     const lineCount = prettyStateString.split("\n").length;
 
     if (lineCount > VALIDATION_LINE_THRESHOLD) {
-        console.log(`✅ State validation passed (${lineCount} lines > ${VALIDATION_LINE_THRESHOLD} lines).`);
+        console.log(
+            getText(
+                `✅ 状态验证通过 (${lineCount} 行 > ${VALIDATION_LINE_THRESHOLD} 行)。`,
+                `✅ State validation passed (${lineCount} lines > ${VALIDATION_LINE_THRESHOLD} lines).`
+            )
+        );
 
         const compactStateString = JSON.stringify(currentState);
         const authFilePath = path.join(configDirPath, authFileName);
 
         fs.writeFileSync(authFilePath, compactStateString);
-        console.log(`   📄 Authentication file saved to: ${path.join(CONFIG_DIR, authFileName)}`);
+        console.log(
+            getText(
+                `   📄 认证文件已保存到: ${path.join(CONFIG_DIR, authFileName)}`,
+                `   📄 Authentication file saved to: ${path.join(CONFIG_DIR, authFileName)}`
+            )
+        );
     } else {
-        console.log(`❌ State validation failed (${lineCount} lines <= ${VALIDATION_LINE_THRESHOLD} lines).`);
-        console.log("   Login status appears to be empty or invalid, file was not saved.");
-        console.log("   Please make sure you are fully logged in before pressing Enter.");
+        console.log(
+            getText(
+                `❌ 状态验证失败 (${lineCount} 行 <= ${VALIDATION_LINE_THRESHOLD} 行)。`,
+                `❌ State validation failed (${lineCount} lines <= ${VALIDATION_LINE_THRESHOLD} lines).`
+            )
+        );
+        console.log(
+            getText(
+                "   登录状态似乎为空或无效，文件未保存。",
+                "   Login status appears to be empty or invalid, file was not saved."
+            )
+        );
+        console.log(
+            getText(
+                "   请确保您已完全登录后再按回车键。",
+                "   Please make sure you are fully logged in before pressing Enter."
+            )
+        );
+
+        await browser.close();
+        console.log("");
+        console.log(getText("浏览器已关闭。", "Browser closed."));
+        process.exit(1); // Exit with error code when validation fails
     }
     // ===================================================================
 
     await browser.close();
-    console.log("\nBrowser closed.");
+    console.log("");
+    console.log(getText("浏览器已关闭。", "Browser closed."));
 
     process.exit(0);
 })();

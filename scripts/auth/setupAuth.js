@@ -11,11 +11,45 @@ const fs = require("fs");
 const https = require("https");
 const os = require("os");
 const path = require("path");
+const readline = require("readline");
 
 const DEFAULT_CAMOUFOX_VERSION = "135.0.1-beta.24";
 const GITHUB_RELEASE_TAG_PREFIX = "v";
 
 const PROJECT_ROOT = path.join(__dirname, "..", "..");
+
+// Language setting (will be set after user selection)
+let lang = "zh";
+
+// Bilingual text helper
+const getText = (zh, en) => (lang === "zh" ? zh : en);
+
+// Prompt user to select language
+const selectLanguage = () =>
+    new Promise(resolve => {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+
+        console.log("");
+        console.log("==========================================");
+        console.log("请选择语言 / Please select language:");
+        console.log("  1. 中文");
+        console.log("  2. English");
+        console.log("==========================================");
+
+        rl.question("> ", answer => {
+            rl.close();
+            const trimmed = answer.trim();
+            if (trimmed === "2" || trimmed.toLowerCase() === "en" || trimmed.toLowerCase() === "english") {
+                lang = "en";
+            } else {
+                lang = "zh";
+            }
+            resolve(lang);
+        });
+    });
 
 const execOrThrow = (command, args, options) => {
     const result = spawnSync(command, args, {
@@ -80,7 +114,7 @@ const getCamoufoxInstallConfig = () => {
         };
     }
 
-    throw new Error(`Unsupported operating system: ${platform}`);
+    throw new Error(getText(`不支持的操作系统: ${platform}`, `Unsupported operating system: ${platform}`));
 };
 
 const downloadFile = async (url, outFilePath) => {
@@ -100,7 +134,14 @@ const downloadFile = async (url, outFilePath) => {
                     if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                         res.resume();
                         if (redirectsLeft <= 0) {
-                            reject(new Error(`Too many redirects while downloading: ${url}`));
+                            reject(
+                                new Error(
+                                    getText(
+                                        `下载时重定向次数过多: ${url}`,
+                                        `Too many redirects while downloading: ${url}`
+                                    )
+                                )
+                            );
                             return;
                         }
                         resolve(fetchOnce(res.headers.location, redirectsLeft - 1));
@@ -112,7 +153,14 @@ const downloadFile = async (url, outFilePath) => {
                         res.on("data", chunk => chunks.push(chunk));
                         res.on("end", () => {
                             const body = Buffer.concat(chunks).toString("utf-8");
-                            reject(new Error(`Download failed (${res.statusCode}): ${body.slice(0, 300)}`));
+                            reject(
+                                new Error(
+                                    getText(
+                                        `下载失败 (${res.statusCode}): ${body.slice(0, 300)}`,
+                                        `Download failed (${res.statusCode}): ${body.slice(0, 300)}`
+                                    )
+                                )
+                            );
                         });
                         return;
                     }
@@ -153,13 +201,27 @@ const fetchJson = async url =>
                     res.on("end", () => {
                         const body = Buffer.concat(chunks).toString("utf-8");
                         if (res.statusCode !== 200) {
-                            reject(new Error(`GitHub API request failed (${res.statusCode}): ${body.slice(0, 300)}`));
+                            reject(
+                                new Error(
+                                    getText(
+                                        `GitHub API 请求失败 (${res.statusCode}): ${body.slice(0, 300)}`,
+                                        `GitHub API request failed (${res.statusCode}): ${body.slice(0, 300)}`
+                                    )
+                                )
+                            );
                             return;
                         }
                         try {
                             resolve(JSON.parse(body));
                         } catch (error) {
-                            reject(new Error(`Failed to parse GitHub API response: ${error.message}`));
+                            reject(
+                                new Error(
+                                    getText(
+                                        `解析 GitHub API 响应失败: ${error.message}`,
+                                        `Failed to parse GitHub API response: ${error.message}`
+                                    )
+                                )
+                            );
                         }
                     });
                 }
@@ -223,7 +285,10 @@ const extractZip = (zipFilePath, destinationDir) => {
     const unzipCheck = spawnSync("unzip", ["-v"], { stdio: "ignore" });
     if (unzipCheck.error || unzipCheck.status !== 0) {
         throw new Error(
-            'Missing "unzip" command. Please install it (macOS usually has it), or set CAMOUFOX_URL and extract manually.'
+            getText(
+                '缺少 "unzip" 命令。请安装它（macOS 通常已预装），或设置 CAMOUFOX_URL 并手动解压。',
+                'Missing "unzip" command. Please install it (macOS usually has it), or set CAMOUFOX_URL and extract manually.'
+            )
         );
     }
 
@@ -275,14 +340,17 @@ const ensureCamoufoxExecutable = async () => {
             const assetNames = Array.isArray(release?.assets) ? release.assets.map(a => a?.name).filter(Boolean) : [];
             throw new Error(
                 [
-                    `Unable to find a Camoufox asset for platform=${process.platform} arch=${process.arch}.`,
-                    `Please set CAMOUFOX_URL to a direct download URL, or download it manually into ${path.relative(
-                        PROJECT_ROOT,
-                        installDir
-                    )}.`,
+                    getText(
+                        `无法找到适用于 platform=${process.platform} arch=${process.arch} 的 Camoufox 资源。`,
+                        `Unable to find a Camoufox asset for platform=${process.platform} arch=${process.arch}.`
+                    ),
+                    getText(
+                        `请设置 CAMOUFOX_URL 为直接下载链接，或手动下载到 ${path.relative(PROJECT_ROOT, installDir)}。`,
+                        `Please set CAMOUFOX_URL to a direct download URL, or download it manually into ${path.relative(PROJECT_ROOT, installDir)}.`
+                    ),
                     assetNames.length > 0
-                        ? `Available assets: ${assetNames.join(", ")}`
-                        : "No assets found in release.",
+                        ? getText(`可用资源: ${assetNames.join(", ")}`, `Available assets: ${assetNames.join(", ")}`)
+                        : getText("发布版本中没有找到资源。", "No assets found in release."),
                 ].join("\n")
             );
         }
@@ -294,14 +362,14 @@ const ensureCamoufoxExecutable = async () => {
 
     const zipFilePath = path.join(PROJECT_ROOT, "camoufox.zip");
 
-    console.log(`[2/4] Checking Camoufox...`);
-    console.log(`Downloading Camoufox (${version})...`);
-    console.log(`Download URL: ${downloadUrl}`);
+    console.log(getText("[2/4] 检查 Camoufox...", "[2/4] Checking Camoufox..."));
+    console.log(getText(`正在下载 Camoufox (${version})...`, `Downloading Camoufox (${version})...`));
+    console.log(getText(`下载地址: ${downloadUrl}`, `Download URL: ${downloadUrl}`));
 
     await downloadFile(downloadUrl, zipFilePath);
-    console.log("Download complete.");
+    console.log(getText("下载完成。", "Download complete."));
 
-    console.log(`[3/4] Extracting Camoufox...`);
+    console.log(getText("[3/4] 正在解压 Camoufox...", "[3/4] Extracting Camoufox..."));
     extractZip(zipFilePath, installDir);
 
     try {
@@ -341,9 +409,15 @@ const ensureCamoufoxExecutable = async () => {
     if (!pathExists(expectedExecutablePath)) {
         throw new Error(
             [
-                "Camoufox extraction completed, but the executable was not found.",
-                `Expected: ${expectedExecutablePath}`,
-                "Try deleting the camoufox directory and rerun setup, or set CAMOUFOX_EXECUTABLE_PATH manually.",
+                getText(
+                    "Camoufox 解压完成，但未找到可执行文件。",
+                    "Camoufox extraction completed, but the executable was not found."
+                ),
+                getText(`预期路径: ${expectedExecutablePath}`, `Expected: ${expectedExecutablePath}`),
+                getText(
+                    "请尝试删除 camoufox 目录并重新运行设置，或手动设置 CAMOUFOX_EXECUTABLE_PATH。",
+                    "Try deleting the camoufox directory and rerun setup, or set CAMOUFOX_EXECUTABLE_PATH manually."
+                ),
             ].join("\n")
         );
     }
@@ -360,27 +434,28 @@ const ensureCamoufoxExecutable = async () => {
 };
 
 const ensureNodeModules = () => {
-    console.log(`[1/4] Checking Node.js dependencies...`);
+    console.log(getText("[1/4] 检查 Node.js 依赖...", "[1/4] Checking Node.js dependencies..."));
     const nodeModulesDir = path.join(PROJECT_ROOT, "node_modules");
     if (pathExists(nodeModulesDir)) {
-        console.log("Dependencies exist, skipping installation.");
+        console.log(getText("依赖已存在，跳过安装。", "Dependencies exist, skipping installation."));
         return;
     }
-    console.log("Installing npm dependencies...");
+    console.log(getText("正在安装 npm 依赖...", "Installing npm dependencies..."));
     execOrThrow(npmCommand(), ["install"], { cwd: PROJECT_ROOT });
 };
 
 const runSaveAuth = camoufoxExecutablePath => {
-    console.log(`[4/4] Starting auth save tool...`);
+    console.log(getText("[4/4] 启动认证保存工具...", "[4/4] Starting auth save tool..."));
     console.log("");
     console.log("==========================================");
-    console.log("  Please follow the prompts to login");
+    console.log(getText("  请按提示在新打开的 Camoufox 窗口中操作", "  Please follow the prompts to login"));
     console.log("==========================================");
     console.log("");
 
     const env = {
         ...process.env,
         CAMOUFOX_EXECUTABLE_PATH: camoufoxExecutablePath,
+        SETUP_AUTH_LANG: lang, // Pass selected language to saveAuth.js
     };
 
     const result = spawnSync(process.execPath, [path.join("scripts", "auth", "saveAuth.js")], {
@@ -391,7 +466,9 @@ const runSaveAuth = camoufoxExecutablePath => {
 
     if (result.error) throw result.error;
     if (typeof result.status === "number" && result.status !== 0) {
-        throw new Error("Auth save failed. Please check error messages above.");
+        throw new Error(
+            getText("认证保存失败。请查看上方错误信息。", "Auth save failed. Please check error messages above.")
+        );
     }
 };
 
@@ -407,10 +484,14 @@ const main = async () => {
         process.exit(0);
     }
 
+    // Ask user to select language first
+    await selectLanguage();
+
+    console.log("");
     console.log("==========================================");
-    console.log("  AI Studio To API - Auth Setup");
+    console.log(getText("  AI Studio To API - 认证设置", "  AI Studio To API - Auth Setup"));
     console.log("==========================================");
-    console.log(`OS: ${os.platform()}  Arch: ${os.arch()}`);
+    console.log(getText(`操作系统: ${os.platform()}  架构: ${os.arch()}`, `OS: ${os.platform()}  Arch: ${os.arch()}`));
     console.log("");
 
     ensureNodeModules();
@@ -420,12 +501,17 @@ const main = async () => {
         camoufoxExecutablePath = await ensureCamoufoxExecutable();
     }
 
-    console.log(`Camoufox executable: ${camoufoxExecutablePath}`);
+    console.log(
+        getText(`Camoufox 可执行文件: ${camoufoxExecutablePath}`, `Camoufox executable: ${camoufoxExecutablePath}`)
+    );
 
     if (process.platform === "darwin") {
         console.log("");
         console.log(
-            'If the first run is blocked by Gatekeeper, please go to "System Settings -> Privacy & Security" to allow the app and try again.'
+            getText(
+                '如果首次运行被 Gatekeeper 阻止，请前往 "系统设置 -> 隐私与安全性" 允许此应用后重试。',
+                'If the first run is blocked by Gatekeeper, please go to "System Settings -> Privacy & Security" to allow the app and try again.'
+            )
         );
     }
 
@@ -433,15 +519,15 @@ const main = async () => {
 
     console.log("");
     console.log("==========================================");
-    console.log("  Auth setup complete!");
+    console.log(getText("  认证设置完成！", "  Auth setup complete!"));
     console.log("==========================================");
     console.log("");
-    console.log('Auth files saved to "configs/auth".');
-    console.log('You can now run "npm start" to start the server.');
+    console.log(getText('认证文件已保存到 "configs/auth"。', 'Auth files saved to "configs/auth".'));
+    console.log(getText('现在可以运行 "npm start" 启动服务器。', 'You can now run "npm start" to start the server.'));
 };
 
 main().catch(error => {
     console.error("");
-    console.error("ERROR:", error?.message || error);
+    console.error(getText("错误:", "ERROR:"), error?.message || error);
     process.exit(1);
 });
