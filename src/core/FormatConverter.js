@@ -71,7 +71,7 @@ class FormatConverter {
         }
 
         // [DEBUG] Log original Gemini tools before sanitization
-        this.logger.info(`[Adapter] Debug: original Gemini tools = ${JSON.stringify(geminiBody.tools, null, 2)}`);
+        this.logger.debug(`[Adapter] Debug: original Gemini tools = ${JSON.stringify(geminiBody.tools, null, 2)}`);
 
         // Helper function to recursively sanitize schema:
         // 1. Remove unsupported fields ($schema, additionalProperties)
@@ -112,7 +112,7 @@ class FormatConverter {
         }
 
         // [DEBUG] Log sanitized Gemini tools after processing
-        this.logger.info(`[Adapter] Debug: sanitized Gemini tools = ${JSON.stringify(geminiBody.tools, null, 2)}`);
+        this.logger.debug(`[Adapter] Debug: sanitized Gemini tools = ${JSON.stringify(geminiBody.tools, null, 2)}`);
 
         this.logger.info("[Adapter] Sanitized Gemini tools (removed unsupported fields, converted type to uppercase)");
         return geminiBody;
@@ -125,10 +125,10 @@ class FormatConverter {
         // eslint-disable-line no-unused-vars
         this.logger.info("[Adapter] Starting translation of OpenAI request format to Google format...");
         // [DEBUG] Log incoming messages for troubleshooting
-        this.logger.info(`[Adapter] Debug: incoming messages = ${JSON.stringify(openaiBody.messages, null, 2)}`);
+        this.logger.debug(`[Adapter] Debug: incoming messages = ${JSON.stringify(openaiBody.messages, null, 2)}`);
         // [DEBUG] Log original OpenAI tools
         if (openaiBody.tools && openaiBody.tools.length > 0) {
-            this.logger.info(`[Adapter] Debug: original OpenAI tools = ${JSON.stringify(openaiBody.tools, null, 2)}`);
+            this.logger.debug(`[Adapter] Debug: original OpenAI tools = ${JSON.stringify(openaiBody.tools, null, 2)}`);
         }
 
         let systemInstruction = null;
@@ -302,9 +302,9 @@ class FormatConverter {
         flushToolParts();
 
         // Build Google request
-        this.logger.info(`[Adapter] Debug: googleContents length = ${googleContents.length}`);
+        this.logger.debug(`[Adapter] Debug: googleContents length = ${googleContents.length}`);
         // [DEBUG] Log full googleContents for troubleshooting thoughtSignature issue
-        this.logger.info(`[Adapter] Debug: googleContents = ${JSON.stringify(googleContents, null, 2)}`);
+        this.logger.debug(`[Adapter] Debug: googleContents = ${JSON.stringify(googleContents, null, 2)}`);
         const googleRequest = {
             contents: googleContents,
             ...(systemInstruction && {
@@ -534,7 +534,7 @@ class FormatConverter {
 
         // [DEBUG] Log full request body for troubleshooting 400 errors
         if (googleRequest.tools && googleRequest.tools.length > 0) {
-            this.logger.info(
+            this.logger.debug(
                 `[Adapter] Debug: Sanitized Openai tools = ${JSON.stringify(googleRequest.tools, null, 2)}`
             );
         }
@@ -550,7 +550,7 @@ class FormatConverter {
      * @param {object} streamState - Optional state object to track thought mode
      */
     translateGoogleToOpenAIStream(googleChunk, modelName = "gemini-2.5-flash-lite", streamState = null) {
-        this.logger.info(`[Adapter] Received Google chunk: ${googleChunk}`);
+        this.logger.debug(`[Adapter] Debug: Received Google chunk: ${googleChunk}`);
 
         // Ensure streamState exists to properly track tool call indices
         if (!streamState) {

@@ -9,6 +9,7 @@
 const fs = require("fs");
 const path = require("path");
 const VersionChecker = require("../utils/VersionChecker");
+const LoggingService = require("../utils/LoggingService");
 
 /**
  * Status Routes Manager
@@ -254,6 +255,18 @@ class StatusRoutes {
             res.status(200).json({ message: "settingUpdateSuccess", setting: "forceUrlContext", value: statusText });
         });
 
+        app.put("/api/settings/debug-mode", isAuthenticated, (req, res) => {
+            const currentLevel = LoggingService.getLevel();
+            const newLevel = currentLevel === "DEBUG" ? "INFO" : "DEBUG";
+            LoggingService.setLevel(newLevel);
+            this.logger.info(`[WebUI] Log level switched to: ${newLevel}`);
+            res.status(200).json({
+                message: "settingUpdateSuccess",
+                setting: "logLevel",
+                value: newLevel === "DEBUG" ? "debug" : "normal",
+            });
+        });
+
         app.post("/api/files", isAuthenticated, (req, res) => {
             const { content } = req.body;
             // Ignore req.body.filename - auto rename
@@ -357,6 +370,7 @@ class StatusRoutes {
                 browserConnected: !!browserManager.browser,
                 currentAccountName,
                 currentAuthIndex,
+                debugMode: LoggingService.isDebugEnabled(),
                 failureCount,
                 forceThinking: this.serverSystem.forceThinking,
                 forceUrlContext: this.serverSystem.forceUrlContext,

@@ -283,6 +283,15 @@
                     <span>{{ t("entries") }}</span
                     >)
                 </h2>
+                <div class="switch-container" style="margin-bottom: 1em">
+                    <span class="switch-label">{{ t("logLevel") }}</span>
+                    <el-switch
+                        v-model="state.debugModeEnabled"
+                        :before-change="handleDebugModeBeforeChange"
+                        style="--el-switch-on-color: #007bff; --el-switch-off-color: #dcdfe6"
+                    />
+                    <span class="switch-status">{{ logLevelText }}</span>
+                </div>
                 <pre id="log-container">{{ state.logs }}</pre>
             </div>
             <div class="version-footer">
@@ -359,6 +368,7 @@ const state = reactive({
     apiKeySource: "",
     browserConnected: false,
     currentAuthIndex: -1,
+    debugModeEnabled: false,
     failureCount: 0,
     forceThinkingEnabled: false,
     forceUrlContextEnabled: false,
@@ -424,6 +434,8 @@ const forceUrlContextText = computed(() => (state.forceUrlContextEnabled ? t("en
 
 const forceWebSearchIcon = computed(() => (state.forceWebSearchEnabled ? "✅" : "❌"));
 const forceWebSearchText = computed(() => (state.forceWebSearchEnabled ? t("enabled") : t("disabled")));
+
+const logLevelText = computed(() => (state.debugModeEnabled ? t("debug") : t("normal")));
 
 const isBusy = computed(() => state.isSwitchingAccount || state.isSystemBusy);
 
@@ -548,6 +560,8 @@ const handleForceUrlContextBeforeChange = () =>
     handleSettingChange("/api/settings/force-url-context", "forceUrlContext");
 
 const handleForceWebSearchBeforeChange = () => handleSettingChange("/api/settings/force-web-search", "forceWebSearch");
+
+const handleDebugModeBeforeChange = () => handleSettingChange("/api/settings/debug-mode", "logLevel");
 
 const handleLogout = () => {
     ElMessageBox.confirm(t("logoutConfirm"), {
@@ -710,6 +724,7 @@ const updateStatus = data => {
     state.forceThinkingEnabled = isEnabled(data.status.forceThinking);
     state.forceWebSearchEnabled = isEnabled(data.status.forceWebSearch);
     state.forceUrlContextEnabled = isEnabled(data.status.forceUrlContext);
+    state.debugModeEnabled = isEnabled(data.status.debugMode);
     state.currentAuthIndex = data.status.currentAuthIndex;
     state.accountDetails = data.status.accountDetails || [];
     state.browserConnected = data.status.browserConnected;
