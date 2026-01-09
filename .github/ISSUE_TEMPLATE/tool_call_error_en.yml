@@ -1,0 +1,67 @@
+name: Tool Call Error Report
+description: Report an error related to tool calls (English)
+title: "[Tool Error]: "
+labels: ["🐛 Bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If you encounter errors related to Tool Calls, please submit a new issue using the format below so that we can quickly identify and resolve the problem.
+
+        **Note:** To troubleshoot tool call issues, we need detailed context logs. Please enable debug mode when reproducing the issue and provide full request and response logs.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version you are currently using
+      placeholder: "e.g., v0.2.11"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api_endpoint
+    attributes:
+      label: API Endpoint
+      options:
+        - OpenAI
+        - Gemini
+    validations:
+      required: true
+
+  - type: input
+    id: model_name
+    attributes:
+      label: Model Name
+      placeholder: "e.g., gemini-3-pro-preview / gemini-3-flash-preview"
+    validations:
+      required: true
+
+  - type: input
+    id: client_tool
+    attributes:
+      label: Client/Tool
+      placeholder: "e.g., NextChat / LobeChat / OpenCode"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: Problem Description
+      description: "Briefly describe the error you encountered (e.g., request succeeded but parameter parsing failed, returned 400 error, etc.)"
+      placeholder: Describe the error details...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log Information (Critical)
+      description: |
+        **Please make sure to enable Debug Mode and resend the request to capture full logs.** Please provide **all logs related to this specific request** (you can determine the range by date/time).
+        > ⚠️ **Attention**: Please remove sensitive information (such as API Keys) from the logs, but **please preserve the overall structure and format of the logs** (especially JSON structure, spacing, and newlines). This is crucial for debugging parsing errors. You can replace sensitive content with `******`.
+      render: text
+      placeholder: Paste detailed logs here...
+    validations:
+      required: true

@@ -1,0 +1,67 @@
+name: 工具调用错误报告
+description: 报告工具调用相关的错误 (中文)
+title: "[工具错误]: "
+labels: ["🐛 Bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        如果您遇到了工具调用（Tool Calls）相关的错误，请务必按照以下格式提交一个新的 Issue，以便我们能够快速定位和解决问题。
+
+        **请注意：** 为了排查工具调用问题，我们需要您提供详细的上下文日志。请在复现问题时开启调试模式，并提供完整的请求和响应日志。
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本号
+      description: 您当前使用的版本
+      placeholder: "例如: v0.2.11"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api_endpoint
+    attributes:
+      label: 请求接口
+      options:
+        - OpenAI
+        - Gemini
+    validations:
+      required: true
+
+  - type: input
+    id: model_name
+    attributes:
+      label: 模型名称
+      placeholder: "例如: gemini-3-pro-preview / gemini-3-flash-preview"
+    validations:
+      required: true
+
+  - type: input
+    id: client_tool
+    attributes:
+      label: 客户端/工具
+      placeholder: "例如: NextChat / LobeChat / OpenCode"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: 问题描述
+      description: "请简要描述您遇到的错误现象，例如：请求成功但参数解析错误、返回 400 错误等"
+      placeholder: 描述错误的具体表现...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志信息 (关键)
+      description: |
+        **请务必开启调试模式 (Debug Mode) 并重新发送请求以获取完整日志。** 请提供**该次请求的所有相关日志**（可以通过日期/时间来确定范围）。
+        > ⚠️ **注意**: 请去除日志中的敏感信息（如 API Key），但**请务必保留日志的整体结构和格式**（尤其是 JSON 结构、空格和换行），这对排查解析错误至关重要。敏感内容可以用 `******` 替代。
+      render: text
+      placeholder: 在这里粘贴详细日志...
+    validations:
+      required: true
