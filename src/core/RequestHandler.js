@@ -77,6 +77,33 @@ class RequestHandler {
     }
 
     /**
+     * Wait for system to become ready (not busy with switching/recovery)
+     * @param {number} timeoutMs - Maximum time to wait in milliseconds (default 120s, same as browser launch timeout)
+     * @returns {Promise<boolean>} true if system becomes ready, false if timeout
+     */
+    async _waitForSystemReady(timeoutMs = 120000) {
+        if (!this.authSwitcher.isSystemBusy) {
+            return true;
+        }
+
+        this.logger.info(`[System] System is busy (switching/recovering), waiting up to ${timeoutMs / 1000}s...`);
+
+        const startTime = Date.now();
+        const checkInterval = 200; // Check every 200ms
+
+        while (Date.now() - startTime < timeoutMs) {
+            if (!this.authSwitcher.isSystemBusy) {
+                this.logger.info(`[System] System ready after ${Date.now() - startTime}ms.`);
+                return true;
+            }
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+        }
+
+        this.logger.warn(`[System] Timeout waiting for system after ${timeoutMs}ms.`);
+        return false;
+    }
+
+    /**
      * Handle browser recovery when connection is lost
      *
      * Important: isSystemBusy flag management strategy:
@@ -87,16 +114,34 @@ class RequestHandler {
      * @returns {boolean} true if recovery successful, false otherwise
      */
     async _handleBrowserRecovery(res) {
+        // Wait for system to become ready if it's busy (someone else is starting/switching browser)
         if (this.authSwitcher.isSystemBusy) {
-            this.logger.warn(
-                "[System] Connection disconnection detected, but system is switching/recovering, rejecting new request."
-            );
-            await this._sendErrorResponse(
-                res,
-                503,
-                "Server undergoing internal maintenance (account switching/recovery), please try again later."
-            );
-            return false;
+            const ready = await this._waitForSystemReady();
+            if (!ready) {
+                await this._sendErrorResponse(
+                    res,
+                    503,
+                    "Server undergoing internal maintenance (account switching/recovery), please try again later."
+                );
+                return false;
+            }
+            // After waiting, also wait for WebSocket connection to be established
+            if (!this.connectionRegistry.hasActiveConnections()) {
+                const connectionReady = await this._waitForConnection(10000);
+                if (!connectionReady) {
+                    // The other process failed to establish connection, return error
+                    this.logger.error(
+                        "[System] WebSocket connection not established after system ready, browser startup may have failed."
+                    );
+                    await this._sendErrorResponse(
+                        res,
+                        503,
+                        "Service temporarily unavailable: Browser failed to start. Please try again."
+                    );
+                    return false;
+                }
+            }
+            return true;
         }
 
         this.logger.error(
@@ -209,15 +254,27 @@ class RequestHandler {
             if (!recovered) return;
         }
 
+        // Wait for system to become ready if it's busy
         if (this.authSwitcher.isSystemBusy) {
-            this.logger.warn(
-                "[System] Received new request, but system is switching/recovering, rejecting new request."
-            );
-            return this._sendErrorResponse(
-                res,
-                503,
-                "Server undergoing internal maintenance (account switching/recovery), please try again later."
-            );
+            const ready = await this._waitForSystemReady();
+            if (!ready) {
+                return this._sendErrorResponse(
+                    res,
+                    503,
+                    "Server undergoing internal maintenance (account switching/recovery), please try again later."
+                );
+            }
+            // After system ready, ensure connection is available
+            if (!this.connectionRegistry.hasActiveConnections()) {
+                const connectionReady = await this._waitForConnection(10000);
+                if (!connectionReady) {
+                    return this._sendErrorResponse(
+                        res,
+                        503,
+                        "Service temporarily unavailable: Connection not established after switching."
+                    );
+                }
+            }
         }
         if (this.browserManager) {
             this.browserManager.notifyUserActivity();
@@ -296,15 +353,27 @@ class RequestHandler {
             if (!recovered) return;
         }
 
+        // Wait for system to become ready if it's busy
         if (this.authSwitcher.isSystemBusy) {
-            this.logger.warn(
-                "[System] Received new request, but system is switching/recovering, rejecting new request."
-            );
-            return this._sendErrorResponse(
-                res,
-                503,
-                "Server undergoing internal maintenance (account switching/recovery), please try again later."
-            );
+            const ready = await this._waitForSystemReady();
+            if (!ready) {
+                return this._sendErrorResponse(
+                    res,
+                    503,
+                    "Server undergoing internal maintenance (account switching/recovery), please try again later."
+                );
+            }
+            // After system ready, ensure connection is available
+            if (!this.connectionRegistry.hasActiveConnections()) {
+                const connectionReady = await this._waitForConnection(10000);
+                if (!connectionReady) {
+                    return this._sendErrorResponse(
+                        res,
+                        503,
+                        "Service temporarily unavailable: Connection not established after switching."
+                    );
+                }
+            }
         }
         if (this.browserManager) {
             this.browserManager.notifyUserActivity();
