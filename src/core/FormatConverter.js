@@ -174,6 +174,46 @@ class FormatConverter {
                 try {
                     responseContent =
                         typeof message.content === "string" ? JSON.parse(message.content) : message.content;
+
+                    // Handle array format (common in MCP, e.g., [{ type: "text", text: "..." }])
+                    // Gemini requires 'response' to be an object (Struct), not an array.
+                    if (Array.isArray(responseContent)) {
+                        // 1. Process ALL items (text, image, etc.)
+                        const processedItems = responseContent.map(item => {
+                            if (item.type === "text" && typeof item.text === "string") {
+                                try {
+                                    return JSON.parse(item.text);
+                                } catch {
+                                    return { content: item.text, type: "text" }; // Wrap raw text
+                                }
+                            }
+                            return item; // Keep other types (e.g. image) as is
+                        });
+
+                        if (processedItems.length > 0) {
+                            // 2. Determine structure
+                            if (
+                                processedItems.length === 1 &&
+                                typeof processedItems[0] === "object" &&
+                                !Array.isArray(processedItems[0]) &&
+                                processedItems[0] !== null
+                            ) {
+                                // Single object: use it directly as the root response (Best for standard MCP)
+                                responseContent = processedItems[0];
+                            } else {
+                                // Multiple/Mixed items: Gemini currently rejects mixed/multiple content in Structs.
+                                // Strategy (User Suggested): Stringify the entire array and wrap it in an object.
+                                // This preserves all data (including images) without breaking the Struct format.
+                                responseContent = { result: JSON.stringify(processedItems) };
+                                this.logger.info(
+                                    `[Adapter] Multiple tool response items found (${processedItems.length}). Wrapping in JSON string to preserve all data.`
+                                );
+                            }
+                        } else {
+                            // Empty array or unforeseen structure, wrap original
+                            responseContent = { result: responseContent };
+                        }
+                    }
                 } catch (e) {
                     // If content is not valid JSON, wrap it
                     responseContent = { result: message.content };
