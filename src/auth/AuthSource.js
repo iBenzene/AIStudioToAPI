@@ -127,7 +127,7 @@ class AuthSource {
                     validIndices.push(index);
                     this.accountNameMap.set(index, authData.accountName || null);
                 } catch (e) {
-                    invalidSourceDescriptions.push(`auth-${index}`);
+                    invalidSourceDescriptions.push(`auth-${index} (parse error)`);
                 }
             } else {
                 invalidSourceDescriptions.push(`auth-${index} (unreadable)`);

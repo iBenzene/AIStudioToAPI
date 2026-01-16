@@ -97,6 +97,51 @@ class BrowserManager {
     }
 
     /**
+     * Feature: Update authentication file
+     * Writes the current storageState back to the auth file, effectively extending session validity.
+     * @param {number} authIndex - The auth index to update
+     */
+    async _updateAuthFile(authIndex) {
+        if (!this.context) return;
+
+        // Check availability of auto-update feature from config
+        if (!this.config.enableAuthUpdate) {
+            return;
+        }
+
+        try {
+            const configDir = path.join(process.cwd(), "configs", "auth");
+            const authFilePath = path.join(configDir, `auth-${authIndex}.json`);
+
+            // Read original file content to preserve all fields (e.g. accountName, custom fields)
+            // Relies on AuthSource validation (checks valid index AND file existence)
+            const authData = this.authSource.getAuth(authIndex);
+            if (!authData) {
+                this.logger.warn(
+                    `[Auth Update] Auth source #${authIndex} returned no data (invalid index or file missing), skipping update.`
+                );
+                return;
+            }
+
+            const storageState = await this.context.storageState();
+
+            // Merge new credentials into existing data
+            authData.cookies = storageState.cookies;
+            authData.origins = storageState.origins;
+
+            // Note: We do NOT force-set accountName. If it was there, it stays; if not, it remains missing.
+            // This preserves the "missing state" as requested.
+
+            // Overwrite the file with merged data
+            await fs.promises.writeFile(authFilePath, JSON.stringify(authData, null, 2));
+
+            this.logger.info(`[Auth Update] 💾 Successfully updated auth credentials for account #${authIndex}`);
+        } catch (error) {
+            this.logger.error(`[Auth Update] ❌ Failed to update auth file: ${error.message}`);
+        }
+    }
+
+    /**
      * Interface: Notify user activity
      * Used to force wake up the Launch detection when a request comes in
      */
@@ -305,7 +350,19 @@ class BrowserManager {
                     }
                 }
 
-                // 2. Popup & Overlay Cleanup
+                // 3. Auto-Save Auth: Every ~24 hours (21600 ticks * 4s = 86400s)
+                if (tickCount % 21600 === 0) {
+                    if (this._currentAuthIndex !== -1) {
+                        try {
+                            this.logger.info("[HealthMonitor] 💾 Triggering daily periodic auth file update...");
+                            await this._updateAuthFile(this._currentAuthIndex);
+                        } catch (e) {
+                            this.logger.warn(`[HealthMonitor] Auth update failed: ${e.message}`);
+                        }
+                    }
+                }
+
+                // 4. Popup & Overlay Cleanup
                 await page.evaluate(() => {
                     const blockers = [
                         "div.cdk-overlay-backdrop",
@@ -887,6 +944,10 @@ class BrowserManager {
             this._startHealthMonitor();
             this._startBackgroundWakeup();
             this._currentAuthIndex = authIndex;
+
+            // [Auth Update] Save the refreshed cookies to the auth file immediately
+            await this._updateAuthFile(authIndex);
+
             this.logger.info("==================================================");
             this.logger.info(`✅ [Browser] Account ${authIndex} context initialized successfully!`);
             this.logger.info("✅ [Browser] Browser client is ready.");
