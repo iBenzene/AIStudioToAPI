@@ -498,10 +498,15 @@ class FormatConverter {
 
         googleRequest.generationConfig = generationConfig;
 
-        // Helper function to convert OpenAI parameter types to Gemini format (uppercase)
-        // Also handles nullable types like ["string", "null"] -> type: "STRING", nullable: true
-        // This function is used for both tools and response_format schema conversion
-        // param {boolean} isResponseSchema - If true, applies stricter rules (e.g. anyOf for unions) for Structured Outputs
+        /**
+         * Helper function to convert OpenAI parameter types to Gemini format (uppercase).
+         * Also handles nullable types like ["string", "null"] -> type: "STRING", nullable: true.
+         * This function is used for both tools and response_format schema conversion.
+         *
+         * @param {Object} obj - The schema object to convert
+         * @param {boolean} [isResponseSchema=false] - If true, applies stricter rules (e.g. anyOf for unions) for Structured Outputs
+         * @returns {Object} The converted schema
+         */
         const convertParameterTypes = (obj, isResponseSchema = false) => {
             if (!obj || typeof obj !== "object") return obj;
 
@@ -562,6 +567,8 @@ class FormatConverter {
                     if (isResponseSchema) {
                         if (Array.isArray(obj[key])) {
                             result[key] = obj[key].map(String);
+                        } else if (obj[key] !== undefined && obj[key] !== null) {
+                            result[key] = [String(obj[key])];
                         }
                         result["type"] = "STRING";
                     } else {
