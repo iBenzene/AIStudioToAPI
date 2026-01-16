@@ -173,7 +173,7 @@ class FormatConverter {
     /**
      * Convert OpenAI request format to Google Gemini format
      * @param {object} openaiBody - OpenAI format request body
-     * @returns {{ googleRequest: object, cleanModelName: string }} - Converted request and cleaned model name
+     * @returns {Promise<{ googleRequest: object, cleanModelName: string }>} - Converted request and cleaned model name
      */
     async translateOpenAIToGoogle(openaiBody) {
         // eslint-disable-line no-unused-vars

@@ -23,7 +23,7 @@ class ConfigLoader {
             apiKeys: [],
             apiKeySource: "Not set",
             browserExecutablePath: null,
-            enableAuthUpdate: false,
+            enableAuthUpdate: true,
             failureThreshold: 3,
             forceThinking: false,
             forceUrlContext: false,
@@ -61,7 +61,7 @@ class ConfigLoader {
         if (process.env.FORCE_URL_CONTEXT)
             config.forceUrlContext = process.env.FORCE_URL_CONTEXT.toLowerCase() === "true";
         if (process.env.ENABLE_AUTH_UPDATE)
-            config.enableAuthUpdate = process.env.ENABLE_AUTH_UPDATE.toLowerCase() === "true";
+            config.enableAuthUpdate = process.env.ENABLE_AUTH_UPDATE.toLowerCase() !== "false";
 
         let rawCodes = process.env.IMMEDIATE_SWITCH_STATUS_CODES;
         let codesSource = "environment variable";

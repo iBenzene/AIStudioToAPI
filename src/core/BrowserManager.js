@@ -352,7 +352,7 @@ class BrowserManager {
 
                 // 3. Auto-Save Auth: Every ~24 hours (21600 ticks * 4s = 86400s)
                 if (tickCount % 21600 === 0) {
-                    if (this._currentAuthIndex !== -1) {
+                    if (this._currentAuthIndex >= 0) {
                         try {
                             this.logger.info("[HealthMonitor] 💾 Triggering daily periodic auth file update...");
                             await this._updateAuthFile(this._currentAuthIndex);
@@ -609,6 +609,16 @@ class BrowserManager {
             this._currentAuthIndex = -1;
             throw new Error(`Invalid authIndex: ${authIndex}. Must be >= 0.`);
         }
+
+        // [Auth Switch] Save current auth data before switching
+        if (this.browser && this._currentAuthIndex >= 0) {
+            try {
+                await this._updateAuthFile(this._currentAuthIndex);
+            } catch (e) {
+                this.logger.warn(`[Browser] Failed to save current auth during switch: ${e.message}`);
+            }
+        }
+
         if (!this.browser) {
             this.logger.info("🚀 [Browser] Main browser instance not running, performing first-time launch...");
             if (!fs.existsSync(this.browserExecutablePath)) {
