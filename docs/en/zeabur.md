@@ -13,7 +13,7 @@ This guide will help you deploy the `aistudio-to-api` service on [Zeabur](https:
 4. **Configure Application**: Fill in the following parameters:
 
    **Image**:
-   - **Image Name**: `ghcr.io/ibenzene/aistudio-to-api:latest`
+   - **Image Name**: `ghcr.io/ibuhub/aistudio-to-api:latest`
    - **Username**: Leave empty
    - **Password**: Leave empty
 

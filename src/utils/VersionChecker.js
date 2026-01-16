@@ -14,7 +14,7 @@ const axios = require("axios");
 class VersionChecker {
     constructor(logger) {
         this.logger = logger;
-        this.repoOwner = "iBenzene";
+        this.repoOwner = "iBUHub";
         this.repoName = "AIStudioToAPI";
     }
 
@@ -66,7 +66,7 @@ class VersionChecker {
      * @returns {Promise<boolean>}
      */
     async checkDockerImageExists(tag) {
-        const image = "ibenzene/aistudio-to-api";
+        const image = "ibuhub/aistudio-to-api";
         const registry = "ghcr.io";
         const manifestUrl = `https://${registry}/v2/${image}/manifests/${tag}`;
 

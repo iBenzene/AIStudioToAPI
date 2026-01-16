@@ -9,7 +9,7 @@ This guide will help you deploy the `aistudio-to-api` service on [Claw Cloud Run
 3. **Configure Application**: Fill in the following parameters:
    - **Application Name**: Enter any name you prefer (e.g., `aistudio-api`).
    - **Image**: Select **Public**.
-   - **Image Name**: `ghcr.io/ibenzene/aistudio-to-api:latest`
+   - **Image Name**: `ghcr.io/ibuhub/aistudio-to-api:latest`
 
    **Usage**:
    - **CPU**: `0.5`

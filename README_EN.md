@@ -22,7 +22,7 @@ A tool that wraps Google AI Studio web interface to provide OpenAI API and Gemin
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/iBenzene/AIStudioToAPI.git
+git clone https://github.com/iBUHub/AIStudioToAPI.git
 cd AIStudioToAPI
 ```
 
@@ -66,7 +66,7 @@ docker run -d \
   -e API_KEYS=your-api-key-1,your-api-key-2 \
   -e TZ=Asia/Shanghai \
   --restart unless-stopped \
-  ghcr.io/ibenzene/aistudio-to-api:latest
+  ghcr.io/ibuhub/aistudio-to-api:latest
 ```
 
 Parameters:
@@ -85,7 +85,7 @@ name: aistudio-to-api
 
 services:
   app:
-    image: ghcr.io/ibenzene/aistudio-to-api:latest
+    image: ghcr.io/ibuhub/aistudio-to-api:latest
     container_name: aistudio-to-api
     ports:
       - 7860:7860

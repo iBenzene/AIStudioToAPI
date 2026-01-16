@@ -318,7 +318,7 @@
             </div>
             <div class="version-footer">
                 <a
-                    href="https://github.com/iBenzene/AIStudioToAPI"
+                    href="https://github.com/iBUHub/AIStudioToAPI"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="github-link"
@@ -341,7 +341,7 @@
                 <span class="version-tag">{{ appVersion }}</span>
                 <a
                     v-if="state.hasUpdate"
-                    :href="state.releaseUrl || 'https://github.com/iBenzene/AIStudioToAPI/releases'"
+                    :href="state.releaseUrl || 'https://github.com/iBUHub/AIStudioToAPI/releases'"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="update-tag"

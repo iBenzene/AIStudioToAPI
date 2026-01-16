@@ -9,7 +9,7 @@
 3. **配置应用**：填写以下参数：
    - **Application Name**：填写一个你喜欢的英文名称（例如 `aistudio-api`）。
    - **Image**：选择 **Public**。
-   - **Image Name**：`ghcr.io/ibenzene/aistudio-to-api:latest`
+   - **Image Name**：`ghcr.io/ibuhub/aistudio-to-api:latest`
 
    **Usage**:
    - **CPU**：`0.5`

@@ -13,7 +13,7 @@
 4. **配置应用**：填写以下参数：
 
    **镜像**：
-   - **镜像名称**：`ghcr.io/ibenzene/aistudio-to-api:latest`
+   - **镜像名称**：`ghcr.io/ibuhub/aistudio-to-api:latest`
    - **用户名**：不用填写
    - **密码**：不用填写
 
