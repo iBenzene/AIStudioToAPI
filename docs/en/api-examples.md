@@ -153,3 +153,109 @@ curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-image:streamGe
     ]
   }'
 ```
+
+### 🎤 TTS (Text-to-Speech)
+
+#### Basic TTS (Default Voice)
+
+```bash
+curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-preview-tts:generateContent \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key-1" \
+  -d '{
+    "contents": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "text": "Hello, this is a text-to-speech test."
+          }
+        ]
+      }
+    ],
+    "generationConfig": {
+      "responseModalities": ["AUDIO"]
+    }
+  }'
+```
+
+#### Specify Voice
+
+Available voices: `Kore`, `Puck`, `Charon`, `Fenrir`, `Aoede`
+
+```bash
+curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-preview-tts:generateContent \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key-1" \
+  -d '{
+    "contents": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "text": "Hello, this is a text-to-speech test."
+          }
+        ]
+      }
+    ],
+    "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "voiceConfig": {
+          "prebuiltVoiceConfig": {
+            "voiceName": "Kore"
+          }
+        }
+      }
+    }
+  }'
+```
+
+#### Multi-Speaker Dialogue
+
+Write the dialogue in the prompt and configure multiple speaker voices using `multiSpeakerVoiceConfig` (up to 2 speakers).
+
+```bash
+curl -X POST http://localhost:7860/v1beta/models/gemini-2.5-flash-preview-tts:generateContent \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key-1" \
+  -d '{
+    "contents": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "text": "TTS the following conversation between Joe and Jane:\nJoe: How are you today Jane?\nJane: I am doing great, thanks for asking!"
+          }
+        ]
+      }
+    ],
+    "generationConfig": {
+      "responseModalities": ["AUDIO"],
+      "speechConfig": {
+        "multiSpeakerVoiceConfig": {
+          "speakerVoiceConfigs": [
+            {
+              "speaker": "Joe",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "Charon"
+                }
+              }
+            },
+            {
+              "speaker": "Jane",
+              "voiceConfig": {
+                "prebuiltVoiceConfig": {
+                  "voiceName": "Kore"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }'
+```
+
+> 💡 **Tip**: TTS responses return base64-encoded audio data in `audio/L16;codec=pcm;rate=24000` format. You need to decode and convert it to WAV format for playback.
