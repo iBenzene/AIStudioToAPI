@@ -200,7 +200,7 @@ class RequestProcessor {
                 const isTtsModel = requestSpec.path.includes("tts");
                 if (isImageModel || isEmbeddingModel || isTtsModel) {
                     // Remove tools
-                    const incompatibleKeys = ["tool_config", "toolChoice", "tools"];
+                    const incompatibleKeys = ["toolConfig", "tool_config", "toolChoice", "tools"];
                     incompatibleKeys.forEach(key => {
                         if (Object.prototype.hasOwnProperty.call(bodyObj, key)) delete bodyObj[key];
                     });
