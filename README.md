@@ -4,8 +4,6 @@
 
 一个将 Google AI Studio 网页端封装为兼容 OpenAI API 和 Gemini API 的工具。该服务将充当代理，将 API 请求转换为与 AI Studio 网页界面的浏览器交互。
 
-> **👏 鸣谢**：本项目为基于 [Ellinav](https://github.com/Ellinav) 的 [ais2api](https://github.com/Ellinav/ais2api) 分支进行的二次开发，我们对原作者创立这个优秀的项目表示诚挚的感谢。
-
 ## ✨ 功能特性
 
 - 🔄 **API 兼容性**：同时兼容 OpenAI API 和 Gemini API 格式
@@ -38,7 +36,11 @@ npm run setup-auth
 - 启动浏览器并自动导航到 AI Studio
 - 在本地保存您的身份验证凭据
 
-3. 启动服务：
+3. 配置环境变量（可选）：
+
+复制根目录下的 `.env.example` 为 `.env`，并在 `.env` 中按需修改配置（如端口、API 密钥等）。
+
+4. 启动服务：
 
 ```bash
 npm start

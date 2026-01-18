@@ -4,8 +4,6 @@
 
 A tool that wraps Google AI Studio web interface to provide OpenAI API and Gemini API compatible endpoints. The service acts as a proxy, converting API requests to browser interactions with the AI Studio web interface.
 
-> **👏 Acknowledgements**: This project is forked from [ais2api](https://github.com/Ellinav/ais2api) by [Ellinav](https://github.com/Ellinav). We express our sincere gratitude to the original author for creating this excellent foundation.
-
 ## ✨ Features
 
 - 🔄 **API Compatibility**: Compatible with both OpenAI API and Gemini API formats
@@ -38,7 +36,11 @@ This script will:
 - Launch the browser and navigate to AI Studio automatically
 - Save your authentication credentials locally
 
-3. Start the service:
+3. Configure Environment Variables (Optional):
+
+Copy `.env.example` in the root directory to `.env`, and modify settings in `.env` as needed (e.g., port, API Key).
+
+4. Start the service:
 
 ```bash
 npm start
