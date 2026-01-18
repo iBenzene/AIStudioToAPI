@@ -117,6 +117,29 @@ sudo docker compose down
 
 **Proxy Configuration (Optional):** If you need to use a proxy to access Google services, add `-e HTTP_PROXY=http://your-proxy:port -e HTTPS_PROXY=http://your-proxy:port` to the Docker command, or add these environment variables to your `docker-compose.yml`.
 
+##### 🛠️ Option 3: Build from Source
+
+If you prefer to build the Docker image yourself, you can use the following commands:
+
+1. Build the image:
+
+```bash
+docker build -t aistudio-to-api .
+```
+
+2. Run the container:
+
+```bash
+docker run -d \
+  --name aistudio-to-api \
+  -p 7860:7860 \
+  -v /path/to/auth:/app/configs/auth \
+  -e API_KEYS=your-api-key-1,your-api-key-2 \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  aistudio-to-api
+```
+
 #### 🔑 Step 2: Account Management
 
 After deployment, you need to add Google accounts using one of these methods:
