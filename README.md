@@ -117,6 +117,29 @@ sudo docker compose down
 
 **代理配置（可选）：** 如需使用代理访问 Google 服务，在 Docker 命令中添加 `-e HTTP_PROXY=http://your-proxy:port -e HTTPS_PROXY=http://your-proxy:port`，或在 `docker-compose.yml` 的 `environment` 中添加这两个环境变量。
 
+##### 🛠️ 方式 3：从源码构建
+
+如果您希望自己构建 Docker 镜像，可以使用以下命令：
+
+1. 构建镜像：
+
+```bash
+docker build -t aistudio-to-api .
+```
+
+2. 运行容器：
+
+```bash
+docker run -d \
+  --name aistudio-to-api \
+  -p 7860:7860 \
+  -v /path/to/auth:/app/configs/auth \
+  -e API_KEYS=your-api-key-1,your-api-key-2 \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  aistudio-to-api
+```
+
 #### 🔑 步骤 2：账号管理
 
 部署后，您需要使用以下方式之一添加 Google 账号：
