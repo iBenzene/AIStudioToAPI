@@ -134,7 +134,7 @@ docker run -d \
   --name aistudio-to-api \
   -p 7860:7860 \
   -v /path/to/auth:/app/configs/auth \
-  -e API_KEYS=your-api-key-1,your-api-key-2 \
+  -e API_KEYS=123456,AIzaSyA5dIf8f56a_6Qmn8VvtjERe4XlqQxFahA \
   -e TZ=Asia/Shanghai \
   --restart unless-stopped \
   aistudio-to-api
