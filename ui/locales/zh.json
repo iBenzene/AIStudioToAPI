@@ -122,6 +122,8 @@
     "ok": "确定",
     "onlyAppliesWhenStreamingEnabled": "仅在启用流式传输时适用",
     "operationInProgress": "操作进行中...",
+    "proxySettings": "代理设置",
+    "proxySettingsStatus": "代理状态",
     "real": "真",
     "realtimeLogs": "实时日志",
     "repo": "仓库",

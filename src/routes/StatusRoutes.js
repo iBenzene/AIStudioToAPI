@@ -254,7 +254,7 @@ class StatusRoutes {
 
             const { authSource } = this.serverSystem;
 
-            if (!authSource.availableIndices.includes(targetIndex)) {
+            if (!authSource.initialIndices.includes(targetIndex)) {
                 return res.status(404).json({ index: targetIndex, message: "errorAccountNotFound" });
             }
 

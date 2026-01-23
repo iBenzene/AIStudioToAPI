@@ -122,6 +122,8 @@
     "ok": "OK",
     "onlyAppliesWhenStreamingEnabled": "only applies when streaming is enabled",
     "operationInProgress": "Operation in progress...",
+    "proxySettings": "Proxy Settings",
+    "proxySettingsStatus": "Proxy Status",
     "real": "Real",
     "realtimeLogs": "Real-time Logs",
     "repo": "Repo",
