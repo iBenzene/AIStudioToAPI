@@ -2,7 +2,7 @@
  * File: scripts/client/build.js
  * Description: Client-side browser script that runs in the headless browser to proxy API requests through WebSocket
  *
- * Author: Ellinav
+ * Author: Ellinav, iBenzene, bbbugg
  */
 
 /* eslint-env browser */

@@ -2,7 +2,7 @@
  * File: ui/app/utils/i18n.js
  * Description: Internationalization utility for managing multiple languages in the client-side application
  *
- * Author: Ellinav, iBenzene, bbbugg
+ * Author: iBenzene, bbbugg
  */
 
 const supportedLangs = new Set(['en', 'zh']);

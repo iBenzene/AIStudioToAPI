@@ -250,21 +250,4 @@ sudo docker compose down
 
 ## 🤝 贡献者
 
-<a href="https://github.com/Ellinav">
-  <img src="https://github.com/Ellinav.png?size=50" width="50" height="50" style="border-radius: 50%; margin-right: 10px;" alt="Ellinav" title="Ellinav (Original Author)" />
-</a>
-<a href="https://github.com/iBenzene">
-  <img src="https://github.com/iBenzene.png?size=50" width="50" height="50" style="border-radius: 50%; margin-right: 10px;" alt="iBenzene" title="iBenzene (Maintainer)" />
-</a>
-<a href="https://github.com/bbbugg">
-  <img src="https://github.com/bbbugg.png?size=50" width="50" height="50" style="border-radius: 50%; margin-right: 10px;" alt="bbbugg" title="bbbugg (Maintainer)" />
-</a>
-<a href="https://github.com/ljh156705">
-  <img src="https://github.com/ljh156705.png?size=50" width="50" height="50" style="border-radius: 50%; margin-right: 10px;" alt="ljh156705" title="挈挈 (Maintainer)" />
-</a>
-<a href="https://github.com/MasakiMu319">
-  <img src="https://github.com/MasakiMu319.png?size=50" width="50" height="50" style="border-radius: 50%; margin-right: 10px;" alt="MasakiMu319" title="MasakiMu319 (Contributor)" />
-</a>
-<a href="https://github.com/Make-magic">
-  <img src="https://github.com/Make-magic.png?size=50" width="50" height="50" style="border-radius: 50%; margin-right: 10px;" alt="Make-magic" title="Make-magic (Contributor)" />
-</a>
+[![Contributors](https://contrib.rocks/image?repo=iBUHub/AIStudioToAPI)](https://github.com/iBUHub/AIStudioToAPI/graphs/contributors)
