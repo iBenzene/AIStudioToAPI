@@ -843,7 +843,7 @@ class BrowserManager {
 
             // Handle various popups with intelligent detection
             // Use short polling instead of long hard-coded timeouts
-            this.logger.info(`[Browser] 🔍 Starting intelligent popup detection (max 5s)...`);
+            this.logger.info(`[Browser] 🔍 Starting intelligent popup detection (max 6s)...`);
 
             const popupConfigs = [
                 {
