@@ -251,3 +251,5 @@ This project is a fork of [**ais2api**](https://github.com/Ellinav/ais2api) by [
 ## 🤝 Contributors
 
 [![Contributors](https://contrib.rocks/image?repo=iBUHub/AIStudioToAPI)](https://github.com/iBUHub/AIStudioToAPI/graphs/contributors)
+
+We would like to thank all developers who have contributed their time, effort, and wisdom to this project.
