@@ -206,9 +206,11 @@
                                     </svg>
                                     {{ t("currentAccount") }}
                                 </span>
-                                <span class="value">
+                                <span class="value account-value">
                                     #{{ state.currentAuthIndex }}
-                                    <span :class="currentAccountNameClass">({{ currentAccountName }})</span>
+                                    <span class="account-name" :class="currentAccountNameClass"
+                                        >({{ currentAccountName }})</span
+                                    >
                                 </span>
                             </div>
                             <div class="status-item">
@@ -256,6 +258,288 @@
                                     {{ t("consecutiveFailures") }}
                                 </span>
                                 <span class="value">{{ state.failureCount }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Proxy Settings Status Card -->
+                    <div class="status-card">
+                        <h3 class="card-title">{{ t("proxySettingsStatus") }}</h3>
+                        <div class="status-list">
+                            <div class="status-item">
+                                <span class="label">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        style="margin-right: 6px; vertical-align: middle"
+                                    >
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                    </svg>
+                                    {{ t("streamingMode") }}
+                                </span>
+                                <span class="value" :class="state.streamingModeReal ? 'status-ok' : 'status-error'">{{
+                                    state.streamingModeReal ? t("enabled") : t("disabled")
+                                }}</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        style="margin-right: 6px; vertical-align: middle"
+                                    >
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                    </svg>
+                                    {{ t("forceThinking") }}
+                                </span>
+                                <span
+                                    class="value"
+                                    :class="state.forceThinkingEnabled ? 'status-ok' : 'status-error'"
+                                    >{{ state.forceThinkingEnabled ? t("enabled") : t("disabled") }}</span
+                                >
+                            </div>
+                            <div class="status-item">
+                                <span class="label">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        style="margin-right: 6px; vertical-align: middle"
+                                    >
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        <path
+                                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                                        ></path>
+                                    </svg>
+                                    {{ t("forceWebSearch") }}
+                                </span>
+                                <span
+                                    class="value"
+                                    :class="state.forceWebSearchEnabled ? 'status-ok' : 'status-error'"
+                                    >{{ state.forceWebSearchEnabled ? t("enabled") : t("disabled") }}</span
+                                >
+                            </div>
+                            <div class="status-item">
+                                <span class="label">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        style="margin-right: 6px; vertical-align: middle"
+                                    >
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                    </svg>
+                                    {{ t("forceUrlContext") }}
+                                </span>
+                                <span
+                                    class="value"
+                                    :class="state.forceUrlContextEnabled ? 'status-ok' : 'status-error'"
+                                    >{{ state.forceUrlContextEnabled ? t("enabled") : t("disabled") }}</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Management Section (Full Width) -->
+                <div class="full-width-section">
+                    <div class="status-card">
+                        <h3 class="card-title">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                style="margin-right: 8px; vertical-align: text-bottom"
+                            >
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            {{ t("accountManagement") }}
+                        </h3>
+                        <!-- Top action buttons: Add and Deduplicate -->
+                        <div class="action-group account-top-actions">
+                            <input
+                                ref="fileInput"
+                                type="file"
+                                style="display: none"
+                                accept=".json"
+                                @change="handleFileUpload"
+                            />
+                            <div class="icon-buttons">
+                                <button :disabled="isBusy" :title="t('btnAddUser')" @click="addUser">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="8.5" cy="7" r="4"></circle>
+                                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                                    </svg>
+                                </button>
+                                <button :disabled="isBusy" :title="t('uploadFile')" @click="triggerFileUpload">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="btn-warning"
+                                    :disabled="isBusy"
+                                    :title="t('btnDeduplicateAuth')"
+                                    @click="deduplicateAuth"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Account list -->
+                        <div class="account-list">
+                            <div
+                                v-for="item in state.accountDetails"
+                                :key="item.index"
+                                class="account-list-item"
+                                :class="{ 'is-current': item.index === state.currentAuthIndex }"
+                            >
+                                <div class="account-info">
+                                    <span class="account-index">#{{ item.index }}</span>
+                                    <span class="account-email" :class="{ 'is-error': item.isInvalid }">
+                                        {{ getAccountDisplayName(item) }}
+                                    </span>
+                                    <span v-if="item.index === state.currentAuthIndex" class="current-badge">
+                                        {{ t("currentAccount") }}
+                                    </span>
+                                </div>
+                                <div class="account-actions">
+                                    <button
+                                        :disabled="isBusy || item.index === state.currentAuthIndex"
+                                        :title="t('btnSwitchAccount')"
+                                        @click="switchAccountByIndex(item.index)"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 1024 1024"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                d="M886.2 604.8H137.8c-22.1 0-40 17.9-40 40 0 8.4 2.6 16.2 7 22.6 1.9 4.5 4.8 8.7 8.4 12.4L289.5 856c7.8 7.8 18 11.7 28.3 11.7s20.5-3.9 28.3-11.7c15.6-15.6 15.6-40.9 0-56.6L231.3 684.8h654.8c22.1 0 40-17.9 40-40s-17.8-40-39.9-40zM137.8 419.2h748.4c22.1 0 40-17.9 40-40 0-8.4-2.6-16.2-7-22.6-1.4-3.3-3.4-6.5-5.8-9.5L769.2 170.9c-14-17.1-39.2-19.6-56.3-5.6-17.1 14-19.6 39.2-5.6 56.3l96.3 117.6H137.8c-22.1 0-40 17.9-40 40s17.9 40 40 40z"
+                                            ></path>
+                                        </svg>
+                                    </button>
+                                    <button
+                                        class="btn-danger"
+                                        :disabled="isBusy"
+                                        :title="t('btnDeleteUser')"
+                                        @click="deleteAccountByIndex(item.index)"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                            ></path>
+                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                        </svg>
+                                    </button>
+                                    <button :title="t('download')" @click="downloadAccountByIndex(item.index)">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        >
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-if="state.accountDetails.length === 0" class="account-list-empty">
+                                {{ t("noActiveAccount") }}
                             </div>
                         </div>
                     </div>
@@ -445,7 +729,7 @@
                         </div>
                     </div>
 
-                    <!-- Actions & Controls Card -->
+                    <!-- Proxy Settings Card -->
                     <div class="status-card">
                         <h3 class="card-title">
                             <svg
@@ -460,179 +744,34 @@
                                 stroke-linejoin="round"
                                 style="margin-right: 8px; vertical-align: text-bottom"
                             >
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                             </svg>
-                            {{ t("accountManagement") }}
+                            {{ t("proxySettings") }}
                         </h3>
-                        <div class="action-group">
-                            <el-select
-                                v-model="state.selectedAccount"
-                                :placeholder="t('noActiveAccount')"
-                                :disabled="isBusy"
-                                style="width: 240px"
-                            >
-                                <el-option
-                                    v-for="item in state.accountDetails"
-                                    :key="item.index"
-                                    :label="`${t('account')} #${item.index} (${getAccountDisplayName(item)})`"
-                                    :value="item.index"
-                                />
-                            </el-select>
-                            <div class="icon-buttons">
-                                <button
-                                    :disabled="isBusy || state.selectedAccount === null"
-                                    :title="t('btnSwitchAccount')"
-                                    @click="switchSpecificAccount"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 1024 1024"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            d="M886.2 604.8H137.8c-22.1 0-40 17.9-40 40 0 8.4 2.6 16.2 7 22.6 1.9 4.5 4.8 8.7 8.4 12.4L289.5 856c7.8 7.8 18 11.7 28.3 11.7s20.5-3.9 28.3-11.7c15.6-15.6 15.6-40.9 0-56.6L231.3 684.8h654.8c22.1 0 40-17.9 40-40s-17.8-40-39.9-40zM137.8 419.2h748.4c22.1 0 40-17.9 40-40 0-8.4-2.6-16.2-7-22.6-1.4-3.3-3.4-6.5-5.8-9.5L769.2 170.9c-14-17.1-39.2-19.6-56.3-5.6-17.1 14-19.6 39.2-5.6 56.3l96.3 117.6H137.8c-22.1 0-40 17.9-40 40s17.9 40 40 40z"
-                                        ></path>
-                                    </svg>
-                                </button>
-                                <button :disabled="isBusy" :title="t('btnAddUser')" @click="addUser">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="8.5" cy="7" r="4"></circle>
-                                        <line x1="20" y1="8" x2="20" y2="14"></line>
-                                        <line x1="23" y1="11" x2="17" y2="11"></line>
-                                    </svg>
-                                </button>
-                                <button
-                                    class="btn-danger"
-                                    :disabled="isBusy || state.selectedAccount === null"
-                                    :title="t('btnDeleteUser')"
-                                    @click="deleteUser"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path
-                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                                        ></path>
-                                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                                    </svg>
-                                </button>
-
-                                <button
-                                    class="btn-warning"
-                                    :disabled="isBusy"
-                                    :title="t('btnDeduplicateAuth')"
-                                    @click="deduplicateAuth"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                                    </svg>
-                                </button>
-                                <input
-                                    ref="fileInput"
-                                    type="file"
-                                    style="display: none"
-                                    accept=".json"
-                                    @change="handleFileUpload"
-                                />
-                                <button :disabled="isBusy" :title="t('uploadFile')" @click="triggerFileUpload">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                                    </svg>
-                                </button>
-                                <button
-                                    :disabled="state.selectedAccount === null"
-                                    :title="t('download')"
-                                    @click="downloadSelectedAccount"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="7 10 12 15 17 10"></polyline>
-                                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="settings-switches" style="margin-top: 20px">
+                        <div class="settings-switches">
                             <div class="switch-container">
-                                <span class="switch-label">{{ t("streamingMode") }}</span>
+                                <span class="label">{{ t("streamingMode") }}</span>
                                 <el-switch
                                     v-model="state.streamingModeReal"
                                     :before-change="handleStreamingModeBeforeChange"
                                 />
                             </div>
                             <div class="switch-container">
-                                <span class="switch-label">{{ t("forceThinking") }}</span>
+                                <span class="label">{{ t("forceThinking") }}</span>
                                 <el-switch
                                     v-model="state.forceThinkingEnabled"
                                     :before-change="handleForceThinkingBeforeChange"
                                 />
                             </div>
                             <div class="switch-container">
-                                <span class="switch-label">{{ t("forceWebSearch") }}</span>
+                                <span class="label">{{ t("forceWebSearch") }}</span>
                                 <el-switch
                                     v-model="state.forceWebSearchEnabled"
                                     :before-change="handleForceWebSearchBeforeChange"
                                 />
                             </div>
                             <div class="switch-container">
-                                <span class="switch-label">{{ t("forceUrlContext") }}</span>
+                                <span class="label">{{ t("forceUrlContext") }}</span>
                                 <el-switch
                                     v-model="state.forceUrlContextEnabled"
                                     :before-change="handleForceUrlContextBeforeChange"
@@ -774,6 +913,8 @@ const browserConnectedText = computed(() => {
     return state.browserConnected ? t("running") : t("disconnected");
 });
 
+const isBusy = computed(() => state.isSwitchingAccount || state.isSystemBusy);
+
 const currentAccountName = computed(() => {
     if (state.currentAuthIndex < 0) {
         return t("noActiveAccount");
@@ -833,8 +974,8 @@ const addUser = () => {
     router.push("/auth");
 };
 
-const deleteUser = async () => {
-    const targetIndex = state.selectedAccount;
+// Delete account by index
+const deleteAccountByIndex = async targetIndex => {
     if (targetIndex === null || targetIndex === undefined) {
         ElMessage.warning(t("noAccountSelected"));
         return;
@@ -846,7 +987,7 @@ const deleteUser = async () => {
     // Helper function to perform the actual deletion
     const performDelete = async (forceDelete = false) => {
         state.isSwitchingAccount = true;
-        let shouldUpdate = true; // Flag to control whether to update content
+        let shouldUpdate = true;
         try {
             const url = forceDelete ? `/api/accounts/${targetIndex}?force=true` : `/api/accounts/${targetIndex}`;
             const res = await fetch(url, {
@@ -854,9 +995,8 @@ const deleteUser = async () => {
             });
             const data = await res.json();
 
-            // If 409 status (requires confirmation for current account), show warning dialog
             if (res.status === 409 && data.requiresConfirmation) {
-                shouldUpdate = false; // Don't update content, just show confirmation dialog
+                shouldUpdate = false;
                 state.isSwitchingAccount = false;
                 ElMessageBox.confirm(t("warningDeleteCurrentAccount"), t("warningTitle"), {
                     cancelButtonText: t("cancel"),
@@ -870,10 +1010,9 @@ const deleteUser = async () => {
                             console.error(e);
                         }
                     });
-                return; // Early return to prevent further execution
+                return;
             }
 
-            // Show success or error messages for completed operations
             const message = t(data.message, data);
             if (res.ok) {
                 ElMessage.success(message);
@@ -890,7 +1029,6 @@ const deleteUser = async () => {
         }
     };
 
-    // First confirmation dialog
     ElMessageBox.confirm(`${t("confirmDelete")} #${targetIndex}${accountSuffix}?`, t("warningTitle"), {
         cancelButtonText: t("cancel"),
         confirmButtonText: t("ok"),
@@ -1069,9 +1207,8 @@ const handleStreamingModeBeforeChange = async () => {
     }
 };
 
-const switchSpecificAccount = () => {
-    const targetIndex = state.selectedAccount;
-
+// Switch account by index
+const switchAccountByIndex = targetIndex => {
     if (state.currentAuthIndex === targetIndex) {
         ElMessage.warning(t("alreadyCurrentAccount"));
         return;
@@ -1254,9 +1391,10 @@ const handleFileUpload = async event => {
     reader.readAsText(file);
 };
 
-const downloadSelectedAccount = () => {
-    if (state.selectedAccount === null) return;
-    window.location.href = `/api/files/auth-${state.selectedAccount}.json`;
+// Download account by index
+const downloadAccountByIndex = accountIndex => {
+    if (accountIndex === null || accountIndex === undefined) return;
+    window.location.href = `/api/files/auth-${accountIndex}.json`;
 };
 
 // Check for updates once on page load
@@ -1436,6 +1574,12 @@ watchEffect(() => {
     }
 }
 
+/* Full Width Section for Account Management */
+.full-width-section {
+    margin-top: 24px;
+    width: 100%;
+}
+
 /* Common Card Styles */
 .status-card {
     background: #fff;
@@ -1472,12 +1616,46 @@ watchEffect(() => {
 
 .label {
     color: @text-secondary;
+    display: inline-flex;
+    align-items: baseline;
+
+    svg {
+        flex-shrink: 0;
+        align-self: center;
+        margin-top: -1px;
+    }
 }
 
 .value {
     font-weight: 500;
     color: @text-primary;
     font-family: @font-family-mono;
+}
+
+.account-value {
+    display: inline-flex;
+    align-items: baseline;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.account-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 450px;
+}
+
+@media (min-width: 600px) {
+    .account-name {
+        max-width: 450px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .account-name {
+        max-width: none;
+    }
 }
 
 .status-ok {
@@ -1586,23 +1764,128 @@ watchEffect(() => {
     }
 }
 
+/* Account list styles */
+.account-top-actions {
+    margin-bottom: 16px;
+}
+
+.account-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.account-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: @background-light;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+
+    &:hover {
+        background: darken(@background-light, 3%);
+    }
+
+    &.is-current {
+        border-color: @primary-color;
+        background: fade(@primary-color, 8%);
+    }
+}
+
+.account-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.account-index {
+    font-family: @font-family-mono;
+    font-size: 0.85rem;
+    color: @text-secondary;
+    flex-shrink: 0;
+}
+
+.account-email {
+    font-size: 0.9rem;
+    color: @text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.is-error {
+        color: @error-color;
+    }
+}
+
+.current-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    background: @primary-color;
+    color: #fff;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.account-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+
+    button {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid @border-color;
+        border-radius: 6px;
+        background: #fff;
+        color: @text-secondary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+            border-color: @primary-color;
+            color: @primary-color;
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        &.btn-danger:hover:not(:disabled) {
+            border-color: @error-color;
+            color: @error-color;
+        }
+    }
+}
+
+.account-list-empty {
+    padding: 24px;
+    text-align: center;
+    color: @text-secondary;
+    font-size: 0.9rem;
+}
+
 .settings-switches {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .switch-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
-    /* background removed as requested */
-    border-bottom: 1px solid @border-light;
-
-    &:last-child {
-        border-bottom: none;
-    }
+    font-size: 0.95rem;
 }
 
 /* Logs View Specifics */
