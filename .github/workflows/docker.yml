@@ -14,6 +14,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME_PRIMARY: ibuhub/aistudio-to-api
   IMAGE_NAME_LEGACY: ibenzene/aistudio-to-api
+  DOCKERHUB_REPO: ibuhub/aistudio-to-api
   VERSION: ${{ github.ref_name }}
 
 jobs:
@@ -65,6 +66,13 @@ jobs:
           username: ibenzene
           password: ${{ secrets.LEGACY_REGISTRY_TOKEN }}
 
+      - name: Log into Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          username: ibuhub
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
@@ -72,6 +80,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PRIMARY }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LEGACY }}
+            ${{ env.DOCKERHUB_REPO }}
           tags: |
             type=ref,event=tag
             type=raw,value=${{ steps.generate_tag.outputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
