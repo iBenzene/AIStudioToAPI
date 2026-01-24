@@ -100,6 +100,13 @@ jobs:
           build-args: VERSION=${{ steps.generate_tag.outputs.tag || env.VERSION }}
           provenance: false
 
+      - name: Sign Primary Images
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: echo "$TAGS" | xargs -r -n 1 -I {} cosign sign --yes {}@${DIGEST}
+
       - name: Log into Docker Hub (ibenzene)
         if: github.event_name != 'pull_request'
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
@@ -130,11 +137,9 @@ jobs:
           build-args: VERSION=${{ steps.generate_tag.outputs.tag || env.VERSION }}
           provenance: false
 
-      - name: Sign the published Docker image
+      - name: Sign Legacy Images
         if: ${{ github.event_name != 'pull_request' }}
         env:
-          TAGS: |-
-            ${{ steps.meta.outputs.tags }}
-            ${{ steps.meta-legacy.outputs.tags }}
+          TAGS: ${{ steps.meta-legacy.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: echo "$TAGS" | xargs -r -n 1 -I {} cosign sign --yes {}@${DIGEST}
