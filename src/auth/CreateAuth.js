@@ -149,8 +149,8 @@ class CreateAuth {
                     this.currentVncAbortController.abort();
                 }
 
-                if (Date.now() - waitStart > 2500) {
-                    // Maximum wait 2.5s (2s cleanup + buffer)
+                if (Date.now() - waitStart > 6000) {
+                    // Maximum wait 6s (covers 2s cleanup + overhead)
                     this.logger.error("[VNC] Timeout waiting for previous session to abort.");
                     return res.status(503).json({ message: "errorVncBusyTimeout" });
                 }
@@ -350,12 +350,15 @@ class CreateAuth {
             // Double check before heavy page load
             checkAborted();
 
-            const page = await context.newPage();
+            const page = await this._runWithSignal(context.newPage(), signal);
 
-            await page.setViewportSize({
-                height: screenHeight,
-                width: screenWidth,
-            });
+            await this._runWithSignal(
+                page.setViewportSize({
+                    height: screenHeight,
+                    width: screenWidth,
+                }),
+                signal
+            );
 
             await page.addInitScript(`
                 (function() {
