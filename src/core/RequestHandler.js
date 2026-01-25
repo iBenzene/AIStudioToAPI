@@ -962,6 +962,17 @@ class RequestHandler {
 
                 lastError = errorPayload;
 
+                // Check if we should stop retrying immediately based on status code
+                if (
+                    this.config.immediateSwitchStatusCodes &&
+                    this.config.immediateSwitchStatusCodes.includes(errorPayload.status)
+                ) {
+                    this.logger.warn(
+                        `[Request] Critical error ${errorPayload.status} detected (${errorPayload.message}), aborting retries immediately.`
+                    );
+                    break;
+                }
+
                 // Log the warning for the current attempt
                 this.logger.warn(
                     `[Request] Attempt #${attempt}/${this.maxRetries} for request #${proxyRequest.request_id} failed: ${errorPayload.message}`
