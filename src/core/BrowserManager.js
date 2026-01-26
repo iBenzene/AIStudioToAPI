@@ -406,6 +406,29 @@ class BrowserManager {
     }
 
     /**
+     * Helper: Save debug information (screenshot and HTML) to root directory
+     */
+    async _saveDebugArtifacts(suffix = "final") {
+        if (!this.page || this.page.isClosed()) return;
+        try {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-").substring(0, 19);
+            const screenshotPath = path.join(process.cwd(), `debug_screenshot_${suffix}_${timestamp}.png`);
+            await this.page.screenshot({
+                fullPage: true,
+                path: screenshotPath,
+            });
+            this.logger.info(`[Debug] Failure screenshot saved to: ${screenshotPath}`);
+
+            const htmlPath = path.join(process.cwd(), `debug_page_source_${suffix}_${timestamp}.html`);
+            const htmlContent = await this.page.content();
+            fs.writeFileSync(htmlPath, htmlContent);
+            this.logger.info(`[Debug] Failure page source saved to: ${htmlPath}`);
+        } catch (e) {
+            this.logger.error(`[Debug] Failed to save debug artifacts: ${e.message}`);
+        }
+    }
+
+    /**
      * Feature: Background Wakeup & "Launch" Button Handler
      * Specifically handles the "Rocket/Launch" button which blocks model loading.
      */
@@ -982,16 +1005,6 @@ class BrowserManager {
                 } catch (error) {
                     this.logger.warn(`  [Attempt ${i}/5] Click failed: ${error.message.split("\n")[0]}`);
                     if (i === 5) {
-                        try {
-                            const screenshotPath = path.join(process.cwd(), "debug_screenshot_final.png");
-                            await this.page.screenshot({
-                                fullPage: true,
-                                path: screenshotPath,
-                            });
-                            this.logger.info(`[Debug] Final failure screenshot saved to: ${screenshotPath}`);
-                        } catch (screenshotError) {
-                            this.logger.error(`[Debug] Failed to save screenshot: ${screenshotError.message}`);
-                        }
                         throw new Error(
                             `Unable to click "Code" button after multiple attempts, initialization failed.`
                         );
@@ -1068,6 +1081,8 @@ class BrowserManager {
             this.logger.info("==================================================");
         } catch (error) {
             this.logger.error(`❌ [Browser] Account ${authIndex} context initialization failed: ${error.message}`);
+            // Save debug info before closing browser
+            await this._saveDebugArtifacts("init_failed");
             await this.closeBrowser();
             this._currentAuthIndex = -1;
             throw error;
