@@ -821,7 +821,14 @@
                                     >
                                         {{ latestVersionFormatted }}
                                     </a>
-                                    <span v-else>{{ latestVersionFormatted }}</span>
+                                    <a
+                                        v-else
+                                        href="https://github.com/iBUHub/AIStudioToAPI/releases"
+                                        target="_blank"
+                                        style="color: inherit; text-decoration: none"
+                                    >
+                                        {{ latestVersionFormatted }}
+                                    </a>
                                 </span>
                             </div>
                         </div>

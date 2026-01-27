@@ -804,6 +804,10 @@ class BrowserManager {
 
             this.page.on("console", msg => {
                 const msgText = msg.text();
+                if (msgText.includes("Content-Security-Policy")) {
+                    return;
+                }
+
                 if (msgText.includes("[ProxyClient]")) {
                     this.logger.info(`[Browser] ${msgText.replace("[ProxyClient] ", "")}`);
                 } else if (msg.type() === "error") {
